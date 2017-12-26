@@ -34,7 +34,32 @@
         <activity
             android:name=".activities.ItemsActivity"
             android:label="@string/title_activity_items"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activities.ItemActivity"
+            android:label="@string/title_activity_item"
+            android:parentActivityName=".activities.ItemsActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.kiki.thehammer.activities.ItemsActivity" />
+        </activity>
+        <activity
+            android:name=".activities.AuctionsActivity"
+            android:label="@string/title_activity_auctions"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activities.AuctionActivity"
+            android:label="@string/title_activity_auction"
+            android:parentActivityName=".activities.AuctionsActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.kiki.thehammer.activities.AuctionsActivity" />
+        </activity>
+        <activity
+            android:name=".activities.SettingsActivity"
+            android:label="@string/title_activity_settings"></activity>
     </application>
 
 </manifest>
