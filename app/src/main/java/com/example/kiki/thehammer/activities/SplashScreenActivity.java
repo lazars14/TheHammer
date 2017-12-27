@@ -5,9 +5,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
 
 import com.example.kiki.thehammer.R;
 
@@ -27,10 +24,15 @@ public class SplashScreenActivity extends AppCompatActivity {
         visibilityTime = preferences.getInt("splash_screen_visibility", 2000);
         visible = preferences.getBoolean("splash_screen_show", true);
 
+        if(visible){
+            setContentView(R.layout.activity_splash_screen);
+        } else {
+            visibilityTime = 0;
+        }
+
         Thread thread = new Thread(){
             @Override
             public void run() {
-                checkIfVisible();
                 setSplashScreenVisibility(visibilityTime);
                 Intent intent = new Intent(getApplicationContext(), ItemsActivity.class);
                 startActivity(intent);
@@ -48,11 +50,4 @@ public class SplashScreenActivity extends AppCompatActivity {
         }
     }
 
-    public void checkIfVisible(){
-        if(visible){
-            setContentView(R.layout.splash_screen_activity);
-        } else {
-            visibilityTime = 0;
-        }
-    }
 }
