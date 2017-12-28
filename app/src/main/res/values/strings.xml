@@ -88,19 +88,19 @@
     <string name="my_data">Personal Settings</string>
     <string name="name">Name</string>
     <string name="app_settings">App Settings</string>
-    <string name="name_default">default_name</string>
+    <string name="firstname_default">John</string>
     <string name="lastname">Last name</string>
-    <string name="lastname_default">default_lastname</string>
+    <string name="lastname_default">Doe</string>
     <string name="email">E-mail</string>
-    <string name="email_default">default_email</string>
+    <string name="email_default">johndoe@gmail.com</string>
     <string name="password">Password</string>
-    <string name="password_default">password_default</string>
+    <string name="password_default">johndoe</string>
     <string name="address">Address</string>
-    <string name="address_default">address_default</string>
+    <string name="address_default">Boulevard 123</string>
     <string name="phone">Phone Number</string>
-    <string name="phone_default">phone_default</string>
+    <string name="phone_default">060123456</string>
     <string name="splash_screen_show">Show Startup Screen</string>
-    <string name="splash_screen_visibility">Startup Screen Wait Time</string>
+    <string name="splash_screen_visibility">Startup Screen Wait Time(seconds)</string>
     <string name="splash_screen_visibility_default">2</string>
     <string name="app_name_upper">THE HAMMER</string>
     <string name="items">Items</string>
@@ -115,4 +115,6 @@
     <string name="filter">Filter</string>
     <string name="status">Finished</string>
     <string name="input_filter">You have to fill in the text field</string>
+    <string name="pref_header_user_info">User info</string>
+    <string name="pref_header_splash_screen">Splash screen</string>
 </resources>

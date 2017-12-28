@@ -1,0 +1,17 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <SwitchPreference
+        android:id="@+id/splash_screen_show"
+        android:title="@string/splash_screen_show"
+        android:key="splash_screen_show"
+        android:defaultValue="true"
+        />
+    <EditTextPreference
+        android:id="@+id/splash_screen_visibility"
+        android:title="@string/splash_screen_visibility"
+        android:key="splash_screen_visibility"
+        android:inputType="number"
+        android:defaultValue="@string/splash_screen_visibility_default"
+        />
+
+</PreferenceScreen>

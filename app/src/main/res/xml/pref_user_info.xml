@@ -1,0 +1,37 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <EditTextPreference
+        android:id="@+id/name"
+        android:title="@string/name"
+        android:key="firstname"
+        android:defaultValue="@string/firstname_default"/>
+    <EditTextPreference
+        android:id="@+id/lastname"
+        android:title="@string/lastname"
+        android:key="lastname"
+        android:defaultValue="@string/lastname_default"/>
+    <EditTextPreference
+        android:id="@+id/email"
+        android:title="@string/email"
+        android:key="email"
+        android:defaultValue="@string/email_default"
+        android:inputType="textEmailAddress"/>
+    <EditTextPreference
+        android:id="@+id/password"
+        android:title="@string/password"
+        android:key="password"
+        android:defaultValue="@string/password_default"
+        android:inputType="textPassword"/>
+    <EditTextPreference
+        android:id="@+id/address"
+        android:title="@string/address"
+        android:key="address"
+        android:defaultValue="@string/address_default"/>
+    <EditTextPreference
+        android:id="@+id/phone"
+        android:title="@string/phone"
+        android:key="phone"
+        android:inputType="phone"
+        android:defaultValue="@string/phone_default"/>
+
+</PreferenceScreen>

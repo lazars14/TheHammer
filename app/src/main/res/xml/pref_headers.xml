@@ -3,18 +3,13 @@
     <!-- These settings headers are only used on tablets. -->
 
     <header
-        android:fragment="com.example.kiki.thehammer.activities.SettingsActivity$GeneralPreferenceFragment"
-        android:icon="@drawable/ic_info_black_24dp"
-        android:title="@string/pref_header_general" />
+        android:fragment="com.example.kiki.thehammer.activities.SettingsActivity$UserInfoPreferenceFragment"
+        android:icon="@drawable/default_user_image"
+        android:title="@string/pref_header_user_info" />
 
     <header
-        android:fragment="com.example.kiki.thehammer.activities.SettingsActivity$NotificationPreferenceFragment"
-        android:icon="@drawable/ic_notifications_black_24dp"
-        android:title="@string/pref_header_notifications" />
-
-    <header
-        android:fragment="com.example.kiki.thehammer.activities.SettingsActivity$DataSyncPreferenceFragment"
-        android:icon="@drawable/ic_sync_black_24dp"
-        android:title="@string/pref_header_data_sync" />
+        android:fragment="com.example.kiki.thehammer.activities.SettingsActivity$SplashScreenPreferenceFragment"
+        android:icon="@drawable/pref_splash_screen"
+        android:title="@string/pref_header_splash_screen" />
 
 </preference-headers>

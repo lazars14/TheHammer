@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.Toast;
 
 import com.example.kiki.thehammer.R;
 
@@ -21,7 +22,10 @@ public class SplashScreenActivity extends AppCompatActivity {
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-        visibilityTime = preferences.getInt("splash_screen_visibility", 2000);
+        visibilityTime = Integer.parseInt(preferences.getString("splash_screen_visibility", "2000"));
+        if(visibilityTime < 1000){
+            visibilityTime *= 1000;
+        }
         visible = preferences.getBoolean("splash_screen_show", true);
 
         if(visible){
