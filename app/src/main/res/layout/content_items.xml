@@ -8,4 +8,6 @@
     tools:context="com.example.kiki.thehammer.activities.ItemsActivity"
     tools:showIn="@layout/activity_items">
 
+    <include layout="@layout/filter_items" android:id="@+id/items_filter"/>
+
 </android.support.constraint.ConstraintLayout>

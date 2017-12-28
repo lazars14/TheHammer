@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="65dp"
+    android:orientation="horizontal"
+    android:padding="10dp"
+    android:background="#FFFF00">
+
+    <TextView
+        android:id="@+id/filter_by_label"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:text="@string/filter_by"
+        android:textSize="6pt"
+        android:gravity="center"
+        />
+
+    <Spinner
+        android:id="@+id/spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginLeft="5dp"
+        />
+
+    <EditText
+        android:id="@+id/filter_text"
+        android:layout_width="150dp"
+        android:layout_height="40dp"
+        android:maxLines="3"
+        android:layout_marginLeft="5dp"/>
+
+    <CheckBox
+        android:id="@+id/auction_status"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:text="@string/status"
+        android:layout_marginLeft="25dp"
+        android:enabled="false"/>
+
+    <Button
+        android:id="@+id/filter_button"
+        android:layout_width="70dp"
+        android:layout_height="40dp"
+        android:text="@string/filter"
+        android:textSize="5pt"
+        android:layout_marginLeft="5dp"
+        android:clickable="true"
+        android:onClick="onClick"/>
+</LinearLayout>

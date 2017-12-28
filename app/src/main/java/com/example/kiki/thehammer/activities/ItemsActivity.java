@@ -11,18 +11,28 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.example.kiki.thehammer.R;
 import com.example.kiki.thehammer.helpers.NavigationHelper;
 
-public class ItemsActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+import java.util.ArrayList;
+import java.util.List;
+
+public class ItemsActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
 
     private NavigationHelper navHelper;
     private DrawerLayout drawer;
     private NavigationView navigationView;
+    private Spinner spinner;
+    private EditText filter_text;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +52,23 @@ public class ItemsActivity extends AppCompatActivity implements NavigationView.O
         navigationView.setNavigationItemSelectedListener(this);
 
         navHelper = new NavigationHelper(getApplicationContext(), navigationView);
+        setSpinnerData();
+    }
+
+    public void setSpinnerData(){
+        View filter_view = (View) findViewById(R.id.items_filter);
+        spinner = (Spinner) filter_view.findViewById(R.id.spinner);
+
+        List<String> spinnerArray =  new ArrayList<String>();
+        spinnerArray.add("name");
+        spinnerArray.add("description");
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                this, android.R.layout.simple_spinner_item, spinnerArray);
+
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        filter_text = (EditText) filter_view.findViewById(R.id.filter_text);
     }
 
     @Override
@@ -93,5 +120,17 @@ public class ItemsActivity extends AppCompatActivity implements NavigationView.O
 
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+
+    @Override
+    public void onClick(View view) {
+        String selected = spinner.getSelectedItem().toString();
+        String text = filter_text.getEditableText().toString();
+        if (selected.equals("name")) {
+
+        } else if(selected.equals("description")){
+
+        }
     }
 }

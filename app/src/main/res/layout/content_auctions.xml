@@ -8,4 +8,6 @@
     tools:context="com.example.kiki.thehammer.activities.AuctionsActivity"
     tools:showIn="@layout/app_bar_auctions">
 
+    <include layout="@layout/filter_auctions" android:id="@+id/auctions_filter"/>
+
 </android.support.constraint.ConstraintLayout>
