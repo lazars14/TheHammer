@@ -117,4 +117,8 @@
     <string name="input_filter">You have to fill in the text field</string>
     <string name="pref_header_user_info">User info</string>
     <string name="pref_header_splash_screen">Splash screen</string>
+    <string name="title_activity_item1">Item1Activity</string>
+    <string name="tab_details">Details</string>
+    <string name="tab_bids">Bids</string>
+    <string name="section_format">Hello World from section: %1$d</string>
 </resources>
