@@ -1,6 +1,9 @@
 package com.example.kiki.thehammer.activities;
 
+import android.content.ContentResolver;
 import android.content.Intent;
+import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -10,6 +13,8 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -21,12 +26,20 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.kiki.thehammer.R;
+import com.example.kiki.thehammer.adapters.ItemsAdapter;
+import com.example.kiki.thehammer.data.TheHammerContract;
 import com.example.kiki.thehammer.helpers.NavigationHelper;
+import com.example.kiki.thehammer.model.Item;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ItemsActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
+
+    private RecyclerView recyclerView;
+    private GridLayoutManager gridLayoutManager;
+    private ItemsAdapter adapter;
+    private List<Item> items = new ArrayList<>();
 
     private NavigationHelper navHelper;
     private DrawerLayout drawer;
@@ -53,7 +66,66 @@ public class ItemsActivity extends AppCompatActivity implements NavigationView.O
 
         navHelper = new NavigationHelper(getApplicationContext(), navigationView);
         setSpinnerData();
+
+        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        load_data_from_content_provider(0);
+
+        gridLayoutManager = new GridLayoutManager(this,1);
+        recyclerView.setLayoutManager(gridLayoutManager);
+
+        adapter = new ItemsAdapter(this, items);
+        recyclerView.setAdapter(adapter);
+
+//        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+//            @Override
+//            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+//
+//                if(gridLayoutManager.findLastCompletelyVisibleItemPosition() == items.size()-1){
+//                    loadDataFromContentProvider(items.get(items.size()-1).getId());
+//                }
+//
+//            }
+//        });
     }
+
+    private void load_data_from_content_provider(int id) {
+
+        AsyncTask<Integer,Void,Void> task = new AsyncTask<Integer, Void, Void>() {
+            @Override
+            protected Void doInBackground(Integer... integers) {
+                ContentResolver resolver = getContentResolver();
+                Cursor cursor =
+                        resolver.query(TheHammerContract.ItemTable.CONTENT_URI,
+                                null,
+                                null,
+                                null,
+                                null);
+                if (cursor.moveToFirst()) {
+                    do {
+                        int id = cursor.getInt(0);
+                        String name = cursor.getString(1);
+                        String description = cursor.getString(2);
+                        String image = cursor.getString(3);
+
+                        Item item = new Item(id, name, description, image);
+                        items.add(item);
+
+                    } while (cursor.moveToNext());
+                }
+
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                adapter.notifyDataSetChanged();
+            }
+        };
+
+        task.execute(id);
+    }
+
+
 
     public void setSpinnerData(){
         View filter_view = (View) findViewById(R.id.items_filter);

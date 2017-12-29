@@ -8,27 +8,25 @@ import java.util.List;
 
 public class Item {
 
-    private long id;
+    private int id;
     public String name;
     public String description;
     public String picture;
     public boolean sold;
     public List<Auction> auctions;
 
-    public Item(long id, String name, String description, String picture, boolean sold, List<Auction> auctions) {
+    public Item(int id, String name, String description, String picture) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.picture = picture;
-        this.sold = sold;
-        this.auctions = auctions;
     }
 
     public long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
