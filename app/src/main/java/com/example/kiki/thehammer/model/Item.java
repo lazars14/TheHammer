@@ -22,7 +22,7 @@ public class Item {
         this.picture = picture;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 

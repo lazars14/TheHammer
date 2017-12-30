@@ -40,6 +40,8 @@ public class ItemActivity extends AppCompatActivity {
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
+    private ItemAuctionFragment item_auction_fragment;
+    private ItemBidsFragment item_bids_fragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +73,8 @@ public class ItemActivity extends AppCompatActivity {
             }
         });
 
+        String desc = getIntent().getStringExtra(getIntent().getStringExtra("description"));
+        item_auction_fragment = ItemAuctionFragment.newInstance(desc);
     }
 
     @Override
@@ -100,7 +104,7 @@ public class ItemActivity extends AppCompatActivity {
             //return PlaceholderFragment.newInstance(position + 1);
             switch (position){
                 case 0:
-                    return new ItemAuctionFragment();
+                    return item_auction_fragment;
                 case 1:
                     return new ItemBidsFragment();
                 default:
