@@ -121,4 +121,7 @@
     <string name="tab_details">Details</string>
     <string name="tab_bids">Bids</string>
     <string name="section_format">Hello World from section: %1$d</string>
+    <string name="title_activity_one_item">OneItemActivity</string>
+    <string name="tab_details_title">Details</string>
+    <string name="tab_bids_title">Bids</string>
 </resources>
