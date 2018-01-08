@@ -76,16 +76,16 @@ public class ItemsActivity extends AppCompatActivity implements NavigationView.O
         adapter = new ItemsAdapter(this, items);
         recyclerView.setAdapter(adapter);
 
-//        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-//            @Override
-//            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-//
-//                if(gridLayoutManager.findLastCompletelyVisibleItemPosition() == items.size()-1){
-//                    loadDataFromContentProvider(items.get(items.size()-1).getId());
-//                }
-//
-//            }
-//        });
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+
+                if(gridLayoutManager.findLastCompletelyVisibleItemPosition() == items.size()-1){
+                    load_data_from_content_provider(items.get(items.size() - 1).getId());
+                }
+
+            }
+        });
     }
 
     private void load_data_from_content_provider(int id) {
@@ -93,21 +93,23 @@ public class ItemsActivity extends AppCompatActivity implements NavigationView.O
         AsyncTask<Integer,Void,Void> task = new AsyncTask<Integer, Void, Void>() {
             @Override
             protected Void doInBackground(Integer... integers) {
+                String selection = TheHammerContract.ItemTable.ITEM_ID + " BETWEEN ? AND ?";
+                String[] selectionArgs = new String[]{ String.valueOf(integers[0] + 1), String.valueOf(integers[0] + 6)};
                 ContentResolver resolver = getContentResolver();
                 Cursor cursor =
                         resolver.query(TheHammerContract.ItemTable.CONTENT_URI,
                                 null,
-                                null,
-                                null,
+                                selection,
+                                 selectionArgs,
                                 null);
                 if (cursor.moveToFirst()) {
                     do {
-                        int id = cursor.getInt(0);
+                        int itemId = cursor.getInt(0);
                         String name = cursor.getString(1);
                         String description = cursor.getString(2);
                         String image = cursor.getString(3);
 
-                        Item item = new Item(id, name, description, image);
+                        Item item = new Item(itemId, name, description, image);
                         items.add(item);
 
                     } while (cursor.moveToNext());

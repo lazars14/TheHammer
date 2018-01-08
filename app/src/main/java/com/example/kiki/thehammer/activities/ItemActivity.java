@@ -72,9 +72,6 @@ public class ItemActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
-
-        String desc = getIntent().getStringExtra(getIntent().getStringExtra("description"));
-        item_auction_fragment = ItemAuctionFragment.newInstance(desc);
     }
 
     @Override
@@ -102,9 +99,14 @@ public class ItemActivity extends AppCompatActivity {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
             //return PlaceholderFragment.newInstance(position + 1);
+//            if(item_auction_fragment == null){
+//                String desc = getIntent().getStringExtra(getIntent().getStringExtra("description"));
+//                item_auction_fragment = ItemAuctionFragment.newInstance(desc);
+//            }
             switch (position){
                 case 0:
-                    return item_auction_fragment;
+                    //String desc = getIntent().getStringExtra(getIntent().getStringExtra("description"));
+                    return new ItemAuctionFragment();
                 case 1:
                     return new ItemBidsFragment();
                 default:

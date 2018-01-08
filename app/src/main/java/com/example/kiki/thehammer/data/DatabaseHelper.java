@@ -108,7 +108,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     private void insertUsers(ContentValues contentValues, SQLiteDatabase db) {
-        for(int i = 0; i < 3; i++){
+        for(int i = 0; i < 30; i++){
             contentValues.put(USER_NAME, "name" + i);
             contentValues.put(USER_EMAIL, "email" + i);
             contentValues.put(USER_PASSWORD, "password" + i);
@@ -123,7 +123,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     private void insertItems(ContentValues contentValues, SQLiteDatabase db) {
-        for(int i = 0; i < 3; i++){
+        for(int i = 0; i < 30; i++){
             contentValues.put(ITEM_NAME, "item" + i);
             contentValues.put(ITEM_DESCRIPTION, "description" + i);
             contentValues.put(ITEM_PICTURE, "item_picture" + i);
@@ -137,7 +137,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private void insertAuctions(ContentValues contentValues, SQLiteDatabase db) {
         // date format for sqlLite "YYYY-MM-DD HH:MM:SS.SSS"
-        for(int i = 0; i < 3; i++){
+        for(int i = 0; i < 30; i++){
             contentValues.put(AUCTION_START_PRICE, 1000);
             contentValues.put(AUCTION_START_DATE, "2017-06-01 00:00:00.000");
             contentValues.put(AUCTION_END_DATE, "2017-06-21 00:00:00.000");
@@ -151,7 +151,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     private void insertBids(ContentValues contentValues, SQLiteDatabase db) {
-        for(int i = 0; i < 3; i++){
+        for(int i = 0; i < 30; i++){
             contentValues.put(BID_PRICE, 1000);
             contentValues.put(BID_DATE_TIME, "2017-06-03 00:00:00.000");
             contentValues.put(BID_AUCTION_ID, i + 1);

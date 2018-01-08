@@ -8,7 +8,9 @@
     tools:context="com.example.kiki.thehammer.activities.ItemsActivity"
     tools:showIn="@layout/activity_items"
     android:orientation="vertical"
-    xmlns:card_view="http://schemas.android.com/tools">
+    xmlns:card_view="http://schemas.android.com/tools"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true">
 
     <include layout="@layout/filter_items" android:id="@+id/items_filter"/>
 
