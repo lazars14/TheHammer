@@ -8,13 +8,13 @@ import java.util.Date;
 
 public class Bid {
 
-    private long id;
+    private int id;
     public double price;
     public Date dateTime;
     public Auction auction;
     public User user;
 
-    public Bid(long id, double price, Date dateTime, Auction auction, User user) {
+    public Bid(int id, double price, Date dateTime, Auction auction, User user) {
         this.id = id;
         this.price = price;
         this.dateTime = dateTime;
@@ -22,11 +22,18 @@ public class Bid {
         this.user = user;
     }
 
-    public long getId() {
+    public Bid(int id, double price, Date dateTime, User user){
+        this.id = id;
+        this.price = price;
+        this.dateTime = dateTime;
+        this.user = user;
+    }
+
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 

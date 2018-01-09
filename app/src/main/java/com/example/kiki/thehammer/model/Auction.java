@@ -9,7 +9,7 @@ import java.util.List;
 
 public class Auction {
 
-    private long id;
+    private int id;
     public double startPrice;
     public Date startDate;
     public Date endDate;
@@ -17,7 +17,7 @@ public class Auction {
     public Item item;
     public List<Bid> bids;
 
-    public Auction(long id, double startPrice, Date startDate, Date endDate, User user, Item item, List<Bid> bids) {
+    public Auction(int id, double startPrice, Date startDate, Date endDate, User user, Item item, List<Bid> bids) {
         this.id = id;
         this.startPrice = startPrice;
         this.startDate = startDate;
@@ -27,11 +27,11 @@ public class Auction {
         this.bids = bids;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 

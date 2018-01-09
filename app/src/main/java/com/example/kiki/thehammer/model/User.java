@@ -8,7 +8,7 @@ import java.util.List;
 
 public class User {
 
-    private long id;
+    private int id;
     private String name;
     private String email;
     private String password;
@@ -18,7 +18,7 @@ public class User {
     private List<Auction> auctions;
     private List<Bid> bids;
 
-    public User(long id, String name, String email, String password, String picture, String address, String phone, List<Auction> auctions, List<Bid> bids){
+    public User(int id, String name, String email, String password, String picture, String address, String phone, List<Auction> auctions, List<Bid> bids){
         this.id = id;
         this.name = name;
         this.email = email;
@@ -30,11 +30,17 @@ public class User {
         this.bids = bids;
     }
 
-    public long getId() {
+    public User(int id, String name, String picture){
+        this.id = id;
+        this.name = name;
+        this.picture = picture;
+    }
+
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 

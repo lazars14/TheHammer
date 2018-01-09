@@ -48,6 +48,17 @@ public class ItemsActivity extends AppCompatActivity implements NavigationView.O
     private EditText filter_text;
 
     @Override
+    public void onResume(){
+        super.onResume();
+        //refreshItems();
+    }
+
+    private void refreshItems(){
+        items = new ArrayList<>();
+        load_data_from_content_provider(0);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_items);

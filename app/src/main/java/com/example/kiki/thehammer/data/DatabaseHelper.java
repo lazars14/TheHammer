@@ -138,10 +138,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private void insertAuctions(ContentValues contentValues, SQLiteDatabase db) {
         // date format for sqlLite "YYYY-MM-DD HH:MM:SS.SSS"
         for(int i = 0; i < 30; i++){
-            contentValues.put(AUCTION_START_PRICE, 1000);
-            contentValues.put(AUCTION_START_DATE, "2017-06-01 00:00:00.000");
-            contentValues.put(AUCTION_END_DATE, "2017-06-21 00:00:00.000");
-            contentValues.put(AUCTION_USER_ID, 0);
+            contentValues.put(AUCTION_START_PRICE, 1000 + i);
+            contentValues.put(AUCTION_START_DATE, "01/01/2017 00:00");
+            contentValues.put(AUCTION_END_DATE, "21/01/2017 00:00");
+            contentValues.put(AUCTION_USER_ID, i + 1);
             contentValues.put(AUCTION_ITEM_ID, i + 1);
 
             db.insert(AUCTION, null, contentValues);
@@ -152,8 +152,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private void insertBids(ContentValues contentValues, SQLiteDatabase db) {
         for(int i = 0; i < 30; i++){
-            contentValues.put(BID_PRICE, 1000);
-            contentValues.put(BID_DATE_TIME, "2017-06-03 00:00:00.000");
+            contentValues.put(BID_PRICE, 1000 + i);
+            contentValues.put(BID_DATE_TIME, "01/01/2017 00:00");
             contentValues.put(BID_AUCTION_ID, i + 1);
             contentValues.put(BID_USER_ID, i + 1);
 
