@@ -104,7 +104,7 @@ public class ItemsActivity extends AppCompatActivity implements NavigationView.O
         AsyncTask<Integer,Void,Void> task = new AsyncTask<Integer, Void, Void>() {
             @Override
             protected Void doInBackground(Integer... integers) {
-                String selection = TheHammerContract.ItemTable.ITEM_ID + " BETWEEN ? AND ?";
+                String selection = TheHammerContract.ItemTable.ITEM_ID + " BETWEEN ? AND ? AND " + TheHammerContract.ItemTable.ITEM_SOLD + " = 0";
                 String[] selectionArgs = new String[]{ String.valueOf(integers[0] + 1), String.valueOf(integers[0] + 6)};
                 ContentResolver resolver = getContentResolver();
                 Cursor cursor =

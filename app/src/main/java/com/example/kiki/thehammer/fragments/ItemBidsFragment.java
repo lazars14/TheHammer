@@ -87,8 +87,16 @@ public class ItemBidsFragment extends Fragment implements View.OnClickListener {
         b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                bids = new ArrayList<>();
-                load_data_from_content_provider(0);
+                //load_data_from_content_provider(0);
+            }
+        });
+
+        ImageButton c = (ImageButton) v.findViewById(R.id.add_bid_btn);
+        b.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // dodavanje bid-a (onaj showdialog, provera da li je isteklo vreme kraja aukcije
+                // refresh bid-ova
             }
         });
 

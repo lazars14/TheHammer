@@ -124,4 +124,6 @@
     <string name="title_activity_one_item">OneItemActivity</string>
     <string name="tab_details_title">Details</string>
     <string name="tab_bids_title">Bids</string>
+    <string name="item_info_title">Item info</string>
+    <string name="auction_info_title">Auction Info</string>
 </resources>

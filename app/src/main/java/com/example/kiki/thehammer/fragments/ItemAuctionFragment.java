@@ -1,28 +1,33 @@
 package com.example.kiki.thehammer.fragments;
 
+import android.content.ContentResolver;
 import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.kiki.thehammer.R;
+import com.example.kiki.thehammer.data.TheHammerContract;
 import com.example.kiki.thehammer.model.Auction;
 import com.example.kiki.thehammer.model.Item;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class ItemAuctionFragment extends Fragment {
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private View auction_info_view;
+    private int item_id;
 
     public ItemAuctionFragment() {
         // Required empty public constructor
@@ -34,37 +39,57 @@ public class ItemAuctionFragment extends Fragment {
         View v = inflater.inflate(R.layout.item_auction_fragment, container, false);
         Bundle bundle = getActivity().getIntent().getExtras();
         if (bundle != null) {
-            String item_name = bundle.getString("name");
-            String item_description = bundle.getString("description");
-            String item_picture = bundle.getString("image");
+            // String item_image = bundle.getString("image");
+            View item_info_view = v.findViewById(R.id.item_info);
+            TextView name = (TextView) item_info_view.findViewById(R.id.name);
+            TextView description = (TextView) item_info_view.findViewById(R.id.description);
+            name.setText(bundle.getString("name"));
+            description.setText(bundle.getString("description"));
 
-//        arguments.putDouble("AUCTION_START_PRICE", auction.getStartPrice());
-//        arguments.putString("AUCTION_START_DATE", auction.getStartDate().toString());
-//        arguments.putString("AUCTION_END_DATE", auction.getEndDate().toString());
-//
-//        arguments.putString("AUCTION_USER_NAME", auction.getUser().getName());
-//        arguments.putString("AUCTION_USER_PICTURE", auction.getUser().getPicture());
+            auction_info_view = v.findViewById(R.id.auction_info);
 
-//            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
-//            double auction_start_price = bundle.getDouble("AUCTION_START_PRICE");
-//            Date auction_start_date = null; Date auction_end_date = null;
-//
-//            try
-//            {
-//                auction_start_date = dateFormat.parse(bundle.getString("AUCTION_START_DATE"));
-//                auction_end_date = dateFormat.parse(bundle.getString("AUCTION_END_DATE"));
-//            }
-//            catch (ParseException e)
-//            {
-//                e.printStackTrace();
-//            }
-//
-//            String auction_user_name = bundle.getString("AUCTION_USER_NAME");
-//            String auction_user_picture = bundle.getString("AUCTION_USER_PICTURE");
+            item_id = bundle.getInt("id");
+            load_auction_info();
         }
 
         return v;
     }
 
+    private void setLabelValuePair(View parentView, int view_id, String label, String value){
+        View v = parentView.findViewById(view_id);
+        TextView label_tv = (TextView) v.findViewById(R.id.label);
+        TextView value_tv = (TextView) v.findViewById(R.id.value);
+        label_tv.setText(label);
+        value_tv.setText(value);
+    }
+
+    private void load_auction_info() {
+
+        AsyncTask<Integer,Void,Void> task = new AsyncTask<Integer, Void, Void>() {
+            @Override
+            protected Void doInBackground(Integer... integers) {
+                ContentResolver resolver = getActivity().getContentResolver();
+                Cursor auction_cursor = resolver.query(TheHammerContract.AuctionTable.CONTENT_URI,
+                        new String[]{TheHammerContract.AuctionTable.AUCTION_START_PRICE,
+                                    TheHammerContract.AuctionTable.AUCTION_START_DATE,
+                                    TheHammerContract.AuctionTable.AUCTION_END_DATE},
+                        TheHammerContract.AuctionTable.AUCTION_ITEM_ID + " = ?",
+                        new String[]{String.valueOf(item_id)},
+                        null);
+                if (auction_cursor.moveToFirst()){
+                    setLabelValuePair(auction_info_view, R.id.start_price, "Start Price:", String.valueOf(auction_cursor.getDouble(0)));
+                    setLabelValuePair(auction_info_view, R.id.start_date, "Start Date:", auction_cursor.getString(1));
+                    setLabelValuePair(auction_info_view, R.id.end_date, "End Date:", auction_cursor.getString(2));
+                }
+
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {}
+        };
+
+        task.execute();
+    }
 
 }
