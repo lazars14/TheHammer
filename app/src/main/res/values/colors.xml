@@ -8,4 +8,5 @@
     <color name="nav_header_background">#FFA500</color>
     <color name="filter_background">#FFFF00</color>
     <color name="spinner_background">#FFFFFF</color>
+    <color name="auction_end_date">#FF0000</color>
 </resources>

@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class ItemBidsFragment extends Fragment implements View.OnClickListener {
+public class ItemBidsFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private GridLayoutManager gridLayoutManager;
@@ -43,17 +43,6 @@ public class ItemBidsFragment extends Fragment implements View.OnClickListener {
 
     public ItemBidsFragment() {
         // Required empty public constructor
-    }
-
-    @Override
-    public void onResume(){
-        super.onResume();
-        //refreshBids();
-    }
-
-    private void refreshBids(){
-        bids = new ArrayList<>();
-        load_data_from_content_provider(0);
     }
 
     @Override
@@ -80,23 +69,6 @@ public class ItemBidsFragment extends Fragment implements View.OnClickListener {
                 if(gridLayoutManager.findLastCompletelyVisibleItemPosition() == bids.size()-1){
                     load_data_from_content_provider(bids.get(bids.size() - 1).getId());
                 }
-            }
-        });
-
-        ImageButton b = (ImageButton) v.findViewById(R.id.refresh_btn);
-        b.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //load_data_from_content_provider(0);
-            }
-        });
-
-        ImageButton c = (ImageButton) v.findViewById(R.id.add_bid_btn);
-        b.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // dodavanje bid-a (onaj showdialog, provera da li je isteklo vreme kraja aukcije
-                // refresh bid-ova
             }
         });
 
@@ -168,16 +140,5 @@ public class ItemBidsFragment extends Fragment implements View.OnClickListener {
         };
 
         task.execute(id);
-    }
-
-    @Override
-    public void onClick(View view) {
-        if(view.getId() == R.id.refresh_btn){
-            bids = new ArrayList<>();
-            load_data_from_content_provider(0);
-            Toast.makeText(getContext(), "successfully reloaded data", Toast.LENGTH_LONG);
-        } else if(view.getId() == R.id.add_bid_btn){
-
-        }
     }
 }
