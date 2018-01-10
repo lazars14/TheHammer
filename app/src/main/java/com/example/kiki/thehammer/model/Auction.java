@@ -27,9 +27,10 @@ public class Auction {
         this.bids = bids;
     }
 
-    public Auction(int id, double startPrice, Date endDate, Item item){
+    public Auction(int id, double startPrice,Date startDate, Date endDate, Item item){
         this.id = id;
         this.startPrice = startPrice;
+        this.startDate = startDate;
         this.endDate = endDate;
         this.item = item;
     }

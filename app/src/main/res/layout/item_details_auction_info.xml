@@ -8,5 +8,7 @@
     <include layout="@layout/label_text_pair" android:id="@+id/start_price"/>
     <include layout="@layout/label_text_pair" android:id="@+id/start_date"/>
     <include layout="@layout/label_text_pair" android:id="@+id/end_date"/>
+    <include layout="@layout/label_text_pair" android:id="@+id/current_price" android:visibility="gone"/>
+    <include layout="@layout/label_text_pair" android:id="@+id/owner_info" android:visibility="gone"/>
 
 </LinearLayout>

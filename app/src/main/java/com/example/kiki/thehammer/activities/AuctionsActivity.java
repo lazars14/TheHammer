@@ -104,6 +104,7 @@ public class AuctionsActivity extends AppCompatActivity
             protected Void doInBackground(Integer... integers) {
                 String[] projection = new String[]{TheHammerContract.AuctionTable.AUCTION_ID,
                                                     TheHammerContract.AuctionTable.AUCTION_START_PRICE,
+                                                    TheHammerContract.AuctionTable.AUCTION_START_DATE,
                                                     TheHammerContract.AuctionTable.AUCTION_END_DATE,
                                                     TheHammerContract.AuctionTable.AUCTION_ITEM_ID};
                 String selection = TheHammerContract.ItemTable.ITEM_ID + " BETWEEN ? AND ?";
@@ -119,13 +120,16 @@ public class AuctionsActivity extends AppCompatActivity
                     do {
                         int auction_id = cursor.getInt(0);
                         Double start_price = cursor.getDouble(1);
-                        String end_date_str = cursor.getString(2);
-                        int item_id = cursor.getInt(3);
+                        String start_date_str = cursor.getString(2);
+                        String end_date_str = cursor.getString(3);
+                        int item_id = cursor.getInt(4);
 
-                        Date date = null;
+                        Date start_date = null;
+                        Date end_date = null;
                         Item item = null;
                         try {
-                            date = format.parse(end_date_str);
+                            start_date = format.parse(start_date_str);
+                            end_date = format.parse(end_date_str);
                         } catch (ParseException e) {
                             e.printStackTrace();
                         }
@@ -145,7 +149,7 @@ public class AuctionsActivity extends AppCompatActivity
 
                             item = new Item(item_id, item_name, item_description, item_picture);
                         }
-                        Auction auction = new Auction(auction_id, start_price, date, item);
+                        Auction auction = new Auction(auction_id, start_price, start_date, end_date, item);
                         auctions.add(auction);
 
                     } while (cursor.moveToNext());

@@ -78,7 +78,14 @@ public class AuctionsAdapter extends RecyclerView.Adapter<AuctionsAdapter.ViewHo
                 @Override
                 public void onClick(View view) {
                     Intent intent = new Intent(context, AuctionActivity.class);
-                    intent.putExtra("id", auction.getId());
+                    intent.putExtra("auction_id", auction.getId());
+                    intent.putExtra("auction_start_price", auction.getStartPrice());
+                    intent.putExtra("auction_start_date", DateFormat.getDateTimeInstance().format(auction.getStartDate()));
+                    intent.putExtra("auction_end_date", DateFormat.getDateTimeInstance().format(auction.getEndDate()));
+                    intent.putExtra("item_id", auction.getItem().getId());
+                    intent.putExtra("item_name", auction.getItem().getName());
+                    intent.putExtra("item_description", auction.getItem().getDescription());
+                    intent.putExtra("item_image", auction.getItem().getPicture());
                     context.startActivity(intent);
                 }
             });

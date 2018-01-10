@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.example.kiki.thehammer.R;
 import com.example.kiki.thehammer.data.TheHammerContract;
+import com.example.kiki.thehammer.helpers.ValuePairViewHelper;
 import com.example.kiki.thehammer.model.Auction;
 import com.example.kiki.thehammer.model.Item;
 
@@ -23,6 +24,8 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import static com.example.kiki.thehammer.helpers.ValuePairViewHelper.setLabelValuePair;
 
 public class ItemAuctionFragment extends Fragment {
 
@@ -55,14 +58,6 @@ public class ItemAuctionFragment extends Fragment {
         return v;
     }
 
-    private void setLabelValuePair(View parentView, int view_id, String label, String value){
-        View v = parentView.findViewById(view_id);
-        TextView label_tv = (TextView) v.findViewById(R.id.label);
-        TextView value_tv = (TextView) v.findViewById(R.id.value);
-        label_tv.setText(label);
-        value_tv.setText(value);
-    }
-
     private void load_auction_info() {
 
         AsyncTask<Integer,Void,Void> task = new AsyncTask<Integer, Void, Void>() {
@@ -77,9 +72,9 @@ public class ItemAuctionFragment extends Fragment {
                         new String[]{String.valueOf(item_id)},
                         null);
                 if (auction_cursor.moveToFirst()){
-                    setLabelValuePair(auction_info_view, R.id.start_price, "Start Price:", String.valueOf(auction_cursor.getDouble(0)));
-                    setLabelValuePair(auction_info_view, R.id.start_date, "Start Date:", auction_cursor.getString(1));
-                    setLabelValuePair(auction_info_view, R.id.end_date, "End Date:", auction_cursor.getString(2));
+                    ValuePairViewHelper.setLabelValuePair(auction_info_view, R.id.start_price, "Start Price:", String.valueOf(auction_cursor.getDouble(0)));
+                    ValuePairViewHelper.setLabelValuePair(auction_info_view, R.id.start_date, "Start Date:", auction_cursor.getString(1));
+                    ValuePairViewHelper.setLabelValuePair(auction_info_view, R.id.end_date, "End Date:", auction_cursor.getString(2));
                 }
 
                 return null;
