@@ -47,7 +47,6 @@ public class ItemBidsFragment extends Fragment {
     private int auction_id;
     private Date end_date;
     private double start_price;
-    private LayoutInflater inflater;
     private String[] cents;
     private final SimpleDateFormat format = new SimpleDateFormat("DD/MM/yyyy hh:mm");
 
@@ -64,7 +63,7 @@ public class ItemBidsFragment extends Fragment {
             item_id = bundle.getInt("id");
         }
 
-        recyclerView = (RecyclerView) v.findViewById(R.id.recycler_view);
+        recyclerView = v.findViewById(R.id.recycler_view);
         load_data_from_content_provider(0);
 
         gridLayoutManager = new GridLayoutManager(getContext(),1);
@@ -96,7 +95,7 @@ public class ItemBidsFragment extends Fragment {
                 LayoutInflater inflater = getActivity().getLayoutInflater();
                 View dialogView = inflater.inflate(R.layout.dialog_add_bid, null);
 
-                NumberPicker euro_picker = (NumberPicker) dialogView.findViewById(R.id.euro_picker);
+                final NumberPicker euro_picker = (NumberPicker) dialogView.findViewById(R.id.euro_picker);
                 double min_price;
                 if(bids.size() > 0) min_price = bids.get(0).getPrice();
                 else min_price = start_price - 1;
@@ -106,7 +105,7 @@ public class ItemBidsFragment extends Fragment {
                 euro_picker.setMinValue(min_price_int);
                 euro_picker.setMaxValue(min_price_int + 1000);
 
-                NumberPicker cent_picker = (NumberPicker) dialogView.findViewById(R.id.cent_picker);
+                final NumberPicker cent_picker = (NumberPicker) dialogView.findViewById(R.id.cent_picker);
 
                 if(cents == null){
                     // ovako ili da ucitam kad ucitavam fragment
@@ -120,6 +119,7 @@ public class ItemBidsFragment extends Fragment {
                 cent_picker.setDisplayedValues(cents);
                 cent_picker.setMinValue(0);
                 cent_picker.setMaxValue(99);
+                // to do
                 cent_picker.setValue(0);
 
                 add_bid_dialog_builder.setView(dialogView);
@@ -129,9 +129,21 @@ public class ItemBidsFragment extends Fragment {
                         .setCancelable(false)
                         .setPositiveButton("Ok",new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog,int id) {
-
-                                Toast.makeText(getContext(), "Bid successfull", Toast.LENGTH_SHORT).show();
-                                Toast.makeText(getContext(), "Bid failed - auction over", Toast.LENGTH_SHORT).show();
+                                Date now = new Date();
+                                if(now.after(end_date)){
+                                    // auction over
+                                    Toast.makeText(getContext(), "Bid failed - auction over", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    // auction still in progress, bid successfull
+                                    double euros = euro_picker.getValue();
+                                    double cents = cent_picker.getValue();
+                                    double euro_cents = euros + cents/100;
+                                    boolean valid = true;
+                                    // dodavanje na firebase
+                                    if(valid) Toast.makeText(getContext(), "Bid successfull", Toast.LENGTH_SHORT).show();
+                                    else Toast.makeText(getContext(), "Bid failed - server error", Toast.LENGTH_SHORT).show();
+                                    // trebao bi da uzmem error sa servera da ispisem tacno koji je
+                                }
                             }
                         })
                         .setNegativeButton("Cancel",new DialogInterface.OnClickListener() {
@@ -145,15 +157,6 @@ public class ItemBidsFragment extends Fragment {
 
                 // show it
                 add_bid_dialog.show();
-
-                /*Date now = new Date();
-                if(now.after(end_date)){
-                    // auction over
-                    // alert dialog
-                } else {
-                    // auction still in progress, bid successfull
-                    // alert dialog
-                }*/
             }
         });
 
