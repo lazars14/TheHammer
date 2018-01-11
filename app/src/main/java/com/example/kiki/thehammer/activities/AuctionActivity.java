@@ -39,6 +39,7 @@ public class AuctionActivity extends AppCompatActivity
     private View auction_info_view;
     private View owner_info_view;
     private double start_price;
+    private double max_price;
 
     private NavigationHelper navHelper;
     private DrawerLayout drawer;
@@ -114,13 +115,12 @@ public class AuctionActivity extends AppCompatActivity
                         TheHammerContract.BidTable.BID_AUCTION_ID + " = ?",
                         new String[]{String.valueOf(integers[0])},
                         TheHammerContract.BidTable.BID_PRICE + " DESC LIMIT 1");
-                double max_price = start_price;
+                max_price = start_price;
                 if (cursor.moveToFirst()){
                     max_price = cursor.getDouble(0);
                 }
-                ValuePairViewHelper.setLabelValuePair(auction_info_view, R.id.current_price, "Current price:", String.valueOf(max_price));
-                View current_price_view = auction_info_view.findViewById(R.id.current_price);
-                current_price_view.setVisibility(View.VISIBLE);
+
+
 
                 cursor.close();
 
@@ -128,7 +128,11 @@ public class AuctionActivity extends AppCompatActivity
             }
 
             @Override
-            protected void onPostExecute(Void aVoid) {}
+            protected void onPostExecute(Void aVoid) {
+                View current_price_view = auction_info_view.findViewById(R.id.current_price);
+                current_price_view.setVisibility(View.VISIBLE);
+                ValuePairViewHelper.setLabelValuePair(auction_info_view, R.id.current_price, "Current price:", String.valueOf(max_price));
+            }
         };
 
         task.execute(auction_id);
