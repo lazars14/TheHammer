@@ -2,19 +2,25 @@ package com.example.kiki.thehammer.fragments;
 
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.InputFilter;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.NumberPicker;
 import android.widget.Toast;
 
 import com.example.kiki.thehammer.R;
@@ -39,7 +45,11 @@ public class ItemBidsFragment extends Fragment {
 
     private int item_id;
     private int auction_id;
-    private final SimpleDateFormat format = new SimpleDateFormat("DD/mm/yyyy hh:mm");
+    private Date end_date;
+    private double start_price;
+    private LayoutInflater inflater;
+    private String[] cents;
+    private final SimpleDateFormat format = new SimpleDateFormat("DD/MM/yyyy hh:mm");
 
     public ItemBidsFragment() {
         // Required empty public constructor
@@ -72,6 +82,81 @@ public class ItemBidsFragment extends Fragment {
             }
         });
 
+        FloatingActionButton fab = (FloatingActionButton) v.findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                Toast.makeText(getContext(), "Bid successfull", Toast.LENGTH_SHORT).show();
+
+                AlertDialog.Builder add_bid_dialog_builder = new AlertDialog.Builder(
+                        getContext());
+
+                // set title
+                add_bid_dialog_builder.setTitle("Enter your bid");
+                LayoutInflater inflater = getActivity().getLayoutInflater();
+                View dialogView = inflater.inflate(R.layout.dialog_add_bid, null);
+
+                NumberPicker euro_picker = (NumberPicker) dialogView.findViewById(R.id.euro_picker);
+                double min_price;
+                if(bids.size() > 0) min_price = bids.get(0).getPrice();
+                else min_price = start_price - 1;
+
+                int min_price_int = Integer.parseInt(String.valueOf(Math.round(min_price)));
+
+                euro_picker.setMinValue(min_price_int);
+                euro_picker.setMaxValue(min_price_int + 1000);
+
+                NumberPicker cent_picker = (NumberPicker) dialogView.findViewById(R.id.cent_picker);
+
+                if(cents == null){
+                    // ovako ili da ucitam kad ucitavam fragment
+                    cents = new String[100];
+                    for(int i = 0; i < 100; i++){
+                        if(i < 10) cents[i] = "0" + i;
+                        else cents[i] = String.valueOf(i);
+                    }
+                }
+
+                cent_picker.setDisplayedValues(cents);
+                cent_picker.setMinValue(0);
+                cent_picker.setMaxValue(99);
+                cent_picker.setValue(0);
+
+                add_bid_dialog_builder.setView(dialogView);
+
+                // set dialog message
+                add_bid_dialog_builder
+                        .setCancelable(false)
+                        .setPositiveButton("Ok",new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,int id) {
+
+                                Toast.makeText(getContext(), "Bid successfull", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), "Bid failed - auction over", Toast.LENGTH_SHORT).show();
+                            }
+                        })
+                        .setNegativeButton("Cancel",new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,int id) {
+                                dialog.cancel();
+                            }
+                        });
+
+                // create alert dialog
+                AlertDialog add_bid_dialog = add_bid_dialog_builder.create();
+
+                // show it
+                add_bid_dialog.show();
+
+                /*Date now = new Date();
+                if(now.after(end_date)){
+                    // auction over
+                    // alert dialog
+                } else {
+                    // auction still in progress, bid successfull
+                    // alert dialog
+                }*/
+            }
+        });
+
         return v;
     }
 
@@ -81,13 +166,22 @@ public class ItemBidsFragment extends Fragment {
             protected Void doInBackground(Integer... integers) {
                 ContentResolver resolver = getActivity().getContentResolver();
                 Cursor auction_cursor = resolver.query(TheHammerContract.AuctionTable.CONTENT_URI,
-                        new String[]{TheHammerContract.AuctionTable.AUCTION_ID},
+                        new String[]{TheHammerContract.AuctionTable.AUCTION_ID,
+                                TheHammerContract.AuctionTable.AUCTION_END_DATE,
+                                TheHammerContract.AuctionTable.AUCTION_START_PRICE},
                         TheHammerContract.AuctionTable.AUCTION_ITEM_ID + " = ?",
                         new String[]{String.valueOf(item_id)},
                         null);
                 if (auction_cursor.moveToFirst()){
                     auction_id = auction_cursor.getInt(0);
+                    try {
+                        end_date = format.parse(auction_cursor.getString(1));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    start_price = auction_cursor.getDouble(2);
                 }
+                auction_cursor.close();
 
                 String selection = TheHammerContract.BidTable.BID_AUCTION_ID + " = ? AND " + TheHammerContract.BidTable.BID_ID + " BETWEEN ? AND ?";
                 String[] selectionArgs = new String[]{ String.valueOf(auction_id), String.valueOf(integers[0] + 1), String.valueOf(integers[0] + 6)};
@@ -127,7 +221,11 @@ public class ItemBidsFragment extends Fragment {
                         Bid bid = new Bid(bid_id, price, date, user);
                         bids.add(bid);
 
+                        user_cursor.close();
+
                     } while (cursor.moveToNext());
+
+                    cursor.close();
                 }
 
                 return null;

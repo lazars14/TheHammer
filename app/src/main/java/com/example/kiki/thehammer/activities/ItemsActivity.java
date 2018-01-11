@@ -125,6 +125,8 @@ public class ItemsActivity extends AppCompatActivity implements NavigationView.O
                         items.add(item);
 
                     } while (cursor.moveToNext());
+
+                    cursor.close();
                 }
 
                 return null;

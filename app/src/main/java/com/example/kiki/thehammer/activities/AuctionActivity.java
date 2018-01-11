@@ -122,6 +122,8 @@ public class AuctionActivity extends AppCompatActivity
                 View current_price_view = auction_info_view.findViewById(R.id.current_price);
                 current_price_view.setVisibility(View.VISIBLE);
 
+                cursor.close();
+
                 return null;
             }
 

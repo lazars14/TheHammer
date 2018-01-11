@@ -31,6 +31,7 @@ public class ItemAuctionFragment extends Fragment {
 
     private View auction_info_view;
     private int item_id;
+    private String start_price, start_date, end_date;
 
     public ItemAuctionFragment() {
         // Required empty public constructor
@@ -59,7 +60,6 @@ public class ItemAuctionFragment extends Fragment {
     }
 
     private void load_auction_info() {
-
         AsyncTask<Integer,Void,Void> task = new AsyncTask<Integer, Void, Void>() {
             @Override
             protected Void doInBackground(Integer... integers) {
@@ -72,19 +72,26 @@ public class ItemAuctionFragment extends Fragment {
                         new String[]{String.valueOf(item_id)},
                         null);
                 if (auction_cursor.moveToFirst()){
-                    ValuePairViewHelper.setLabelValuePair(auction_info_view, R.id.start_price, "Start Price:", String.valueOf(auction_cursor.getDouble(0)));
-                    ValuePairViewHelper.setLabelValuePair(auction_info_view, R.id.start_date, "Start Date:", auction_cursor.getString(1));
-                    ValuePairViewHelper.setLabelValuePair(auction_info_view, R.id.end_date, "End Date:", auction_cursor.getString(2));
+                    start_price = String.valueOf(auction_cursor.getDouble(0));
+                    start_date = auction_cursor.getString(1);
+                    end_date = auction_cursor.getString(2);
+//                    ValuePairViewHelper.setLabelValuePair(auction_info_view, R.id.start_price, "Start Price:", String.valueOf(auction_cursor.getDouble(0)));
+//                    ValuePairViewHelper.setLabelValuePair(auction_info_view, R.id.start_date, "Start Date:", auction_cursor.getString(1));
+//                    ValuePairViewHelper.setLabelValuePair(auction_info_view, R.id.end_date, "End Date:", auction_cursor.getString(2));
                 }
+                auction_cursor.close();
 
                 return null;
             }
 
             @Override
-            protected void onPostExecute(Void aVoid) {}
+            protected void onPostExecute(Void aVoid) {
+                ValuePairViewHelper.setLabelValuePair(auction_info_view, R.id.start_price, "Start Price:", start_price);
+                ValuePairViewHelper.setLabelValuePair(auction_info_view, R.id.start_date, "Start Date:", start_date);
+                ValuePairViewHelper.setLabelValuePair(auction_info_view, R.id.end_date, "End Date:", end_date);
+            }
         };
 
         task.execute();
     }
-
 }

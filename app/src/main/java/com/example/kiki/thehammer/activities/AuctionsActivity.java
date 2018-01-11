@@ -152,7 +152,11 @@ public class AuctionsActivity extends AppCompatActivity
                         Auction auction = new Auction(auction_id, start_price, start_date, end_date, item);
                         auctions.add(auction);
 
+                        item_cursor.close();
+
                     } while (cursor.moveToNext());
+
+                    cursor.close();
                 }
 
                 return null;
