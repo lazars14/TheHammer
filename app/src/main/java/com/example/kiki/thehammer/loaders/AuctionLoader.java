@@ -26,4 +26,6 @@ public class AuctionLoader extends CursorLoader {
 
         return provider.query(TheHammerContract.AuctionTable.CONTENT_URI, null, null, null, null);
     }
+
+
 }

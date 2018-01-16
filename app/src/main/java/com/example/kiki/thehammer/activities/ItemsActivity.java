@@ -29,6 +29,7 @@ import android.widget.Toast;
 import com.example.kiki.thehammer.R;
 import com.example.kiki.thehammer.adapters.ItemsAdapter;
 import com.example.kiki.thehammer.data.TheHammerContract;
+import com.example.kiki.thehammer.helpers.FilterHelper;
 import com.example.kiki.thehammer.helpers.NavigationHelper;
 import com.example.kiki.thehammer.model.Item;
 
@@ -47,6 +48,8 @@ public class ItemsActivity extends AppCompatActivity implements NavigationView.O
     private NavigationView navigationView;
     private Spinner spinner;
     private EditText filter_text;
+
+    private FilterHelper filterHelper;
 
     @Override
     public void onResume(){
@@ -85,19 +88,7 @@ public class ItemsActivity extends AppCompatActivity implements NavigationView.O
         gridLayoutManager = new GridLayoutManager(this,1);
         recyclerView.setLayoutManager(gridLayoutManager);
 
-        adapter = new ItemsAdapter(this, items);
-        recyclerView.setAdapter(adapter);
-
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-
-                if(gridLayoutManager.findLastCompletelyVisibleItemPosition() == items.size()-1){
-                    load_data_from_content_provider(items.get(items.size() - 1).getId());
-                }
-
-            }
-        });
+        setRecyclerView();
     }
 
     private void load_data_from_content_provider(int id) {
@@ -199,7 +190,7 @@ public class ItemsActivity extends AppCompatActivity implements NavigationView.O
         int id = item.getItemId();
 
         if (id == R.id.items) {
-
+            navHelper.navigateTo(ItemsActivity.class, this);
         } else if (id == R.id.auctions) {
             navHelper.navigateTo(AuctionsActivity.class, this);
         } else if (id == R.id.settings) {
@@ -213,12 +204,27 @@ public class ItemsActivity extends AppCompatActivity implements NavigationView.O
 
     @Override
     public void onClick(View view) {
-        String selected = spinner.getSelectedItem().toString();
-        String text = filter_text.getEditableText().toString();
-        if (selected.equals("name")) {
-
-        } else if(selected.equals("description")){
-
+        if(filter_text.getText().toString().equals("")){
+            setRecyclerView();
+        } else {
+            filterHelper = new FilterHelper(spinner.getSelectedItem().toString(), filter_text.getEditableText().toString(), items, recyclerView, this);
         }
+
+    }
+
+    public void setRecyclerView(){
+        adapter = new ItemsAdapter(this, items);
+        recyclerView.setAdapter(adapter);
+
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+
+                if(gridLayoutManager.findLastCompletelyVisibleItemPosition() == items.size()-1){
+                    load_data_from_content_provider(items.get(items.size() - 1).getId());
+                }
+
+            }
+        });
     }
 }

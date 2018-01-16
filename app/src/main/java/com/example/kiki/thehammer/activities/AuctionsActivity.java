@@ -30,6 +30,7 @@ import com.example.kiki.thehammer.R;
 import com.example.kiki.thehammer.adapters.AuctionsAdapter;
 import com.example.kiki.thehammer.adapters.ItemsAdapter;
 import com.example.kiki.thehammer.data.TheHammerContract;
+import com.example.kiki.thehammer.helpers.FilterHelper;
 import com.example.kiki.thehammer.helpers.NavigationHelper;
 import com.example.kiki.thehammer.model.Auction;
 import com.example.kiki.thehammer.model.Item;
@@ -57,6 +58,8 @@ public class AuctionsActivity extends AppCompatActivity
     private EditText filter_text;
     private CheckBox filter_status;
 
+    private FilterHelper filterHelper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,19 +74,7 @@ public class AuctionsActivity extends AppCompatActivity
         gridLayoutManager = new GridLayoutManager(this,1);
         recyclerView.setLayoutManager(gridLayoutManager);
 
-        adapter = new AuctionsAdapter(this, auctions);
-        recyclerView.setAdapter(adapter);
-
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-
-                if(gridLayoutManager.findLastCompletelyVisibleItemPosition() == auctions.size()-1){
-                    load_data_from_content_provider(auctions.get(auctions.size() - 1).getId());
-                }
-
-            }
-        });
+        setRecyclerView();
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -136,9 +127,9 @@ public class AuctionsActivity extends AppCompatActivity
 
                         Cursor item_cursor =
                                 resolver.query(TheHammerContract.ItemTable.CONTENT_URI,
-                                        new String[]{TheHammerContract.ItemTable.PROJECTION[1],
-                                                TheHammerContract.ItemTable.PROJECTION[2],
-                                                TheHammerContract.ItemTable.PROJECTION[3]},
+                                        new String[]{TheHammerContract.ItemTable.ITEM_NAME,
+                                                TheHammerContract.ItemTable.ITEM_DESCRIPTION,
+                                                TheHammerContract.ItemTable.ITEM_PICTURE},
                                         TheHammerContract.ItemTable.ITEM_ID + " = ?",
                                         new String[]{String.valueOf(item_id)},
                                         null);
@@ -250,7 +241,7 @@ public class AuctionsActivity extends AppCompatActivity
         if (id == R.id.items) {
             navHelper.navigateTo(ItemsActivity.class, this);
         } else if (id == R.id.auctions) {
-
+            navHelper.navigateTo(AuctionsActivity.class, this);
         } else if (id == R.id.settings) {
             navHelper.navigateTo(SettingsActivity.class, this);
         }
@@ -261,15 +252,26 @@ public class AuctionsActivity extends AppCompatActivity
 
     @Override
     public void onClick(View view) {
-        String selected = spinner.getSelectedItem().toString();
-        String text = filter_text.getEditableText().toString();
-
-        if (selected.equals("name")) {
-
-        } else if(selected.equals("description")){
-
-        } else if(selected.equals("status")){
-            boolean status = filter_status.isChecked();
+        if(filter_text.getText().toString().equals("")){
+            setRecyclerView();
+        } else {
+            filterHelper = new FilterHelper(spinner.getSelectedItem().toString(), filter_text.getEditableText().toString(), auctions, filter_status.isChecked(), recyclerView, this);
         }
+    }
+
+    public void setRecyclerView(){
+        adapter = new AuctionsAdapter(this, auctions);
+        recyclerView.setAdapter(adapter);
+
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+
+                if(gridLayoutManager.findLastCompletelyVisibleItemPosition() == auctions.size()-1){
+                    load_data_from_content_provider(auctions.get(auctions.size() - 1).getId());
+                }
+
+            }
+        });
     }
 }
