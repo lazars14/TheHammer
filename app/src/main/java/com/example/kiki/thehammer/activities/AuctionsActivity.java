@@ -61,6 +61,13 @@ public class AuctionsActivity extends AppCompatActivity
     private FilterHelper filterHelper;
 
     @Override
+    public void onResume(){
+        super.onResume();
+
+        navHelper.initUserInfo();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auctions);

@@ -54,7 +54,8 @@ public class ItemsActivity extends AppCompatActivity implements NavigationView.O
     @Override
     public void onResume(){
         super.onResume();
-        //refreshItems();
+
+        navHelper.initUserInfo();
     }
 
     private void refreshItems(){
@@ -227,4 +228,6 @@ public class ItemsActivity extends AppCompatActivity implements NavigationView.O
             }
         });
     }
+
+
 }

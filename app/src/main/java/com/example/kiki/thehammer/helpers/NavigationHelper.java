@@ -18,24 +18,27 @@ import com.example.kiki.thehammer.R;
 public class NavigationHelper {
 
     private Context appContext;
+    private NavigationView navigationView;
+    private TextView firstAndLastname;
+    private TextView email;
+    private TextView address;
 
     public NavigationHelper(Context applicationContext, NavigationView navigationView){
-        appContext = applicationContext;
-        initUserInfo(navigationView);
+        this.appContext = applicationContext;
+        this.navigationView = navigationView;
+        getViewsForUserInfo();
+        initUserInfo();
     }
 
-    public void navigateTo(Class activity, AppCompatActivity currentActivity){
-        Intent intent = new Intent(appContext, activity);
-        currentActivity.startActivity(intent);
-    }
-
-    public void initUserInfo(NavigationView navigationView){
+    public void getViewsForUserInfo(){
         View headerView = navigationView.getHeaderView(0);
         // image to do
-        TextView firstAndLastname = (TextView) headerView.findViewById(R.id.first_and_last_name);
-        TextView email = (TextView) headerView.findViewById(R.id.email);
-        TextView address = (TextView) headerView.findViewById(R.id.address);
+        firstAndLastname = (TextView) headerView.findViewById(R.id.first_and_last_name);
+        email = (TextView) headerView.findViewById(R.id.email);
+        address = (TextView) headerView.findViewById(R.id.address);
+    }
 
+    public void initUserInfo(){
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(appContext);
 
         String firstAndLastnameText = preferences.getString("firstname", "John") + " " + preferences.getString("lastname", "Doe");
@@ -43,5 +46,10 @@ public class NavigationHelper {
         firstAndLastname.setText(firstAndLastnameText);
         email.setText(preferences.getString("email", "johndoe@gmail.com"));
         address.setText(preferences.getString("address", "Boulevard 123"));
+    }
+
+    public void navigateTo(Class activity, AppCompatActivity currentActivity){
+        Intent intent = new Intent(appContext, activity);
+        currentActivity.startActivity(intent);
     }
 }

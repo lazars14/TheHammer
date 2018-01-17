@@ -30,6 +30,13 @@ public class ItemActivity extends AppCompatActivity
     private DrawerLayout drawer;
 
     @Override
+    public void onResume(){
+        super.onResume();
+
+        navHelper.initUserInfo();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_item);

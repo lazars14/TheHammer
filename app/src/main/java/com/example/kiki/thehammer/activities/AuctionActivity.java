@@ -46,6 +46,13 @@ public class AuctionActivity extends AppCompatActivity
     private NavigationView navigationView;
 
     @Override
+    public void onResume(){
+        super.onResume();
+
+        navHelper.initUserInfo();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auction);

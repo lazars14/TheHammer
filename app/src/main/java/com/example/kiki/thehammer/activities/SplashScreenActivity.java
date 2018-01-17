@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
 import com.example.kiki.thehammer.R;
+import com.example.kiki.thehammer.helpers.NavigationHelper;
 
 import static java.lang.Thread.sleep;
 
