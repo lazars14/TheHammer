@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "17201106681",
+    "firebase_url": "https://thehammer-c625b.firebaseio.com",
+    "project_id": "thehammer-c625b",
+    "storage_bucket": "thehammer-c625b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:17201106681:android:a82c7a66e6565b7b",
+        "android_client_info": {
+          "package_name": "com.example.kiki.thehammer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "17201106681-l905r5irb9i5tbacramicaf5o1m7jrrf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.kiki.thehammer",
+            "certificate_hash": "29a3c49883f228549e78e8d3abde99db0a6967c0"
+          }
+        },
+        {
+          "client_id": "17201106681-gam84oek26abt8i57lopmlascvqtgl22.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCmrmkLsqY0RMsgLXlUhG5MzgjbMKr3fi8"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "17201106681-gam84oek26abt8i57lopmlascvqtgl22.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
