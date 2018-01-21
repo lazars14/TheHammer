@@ -3,7 +3,6 @@ package com.example.kiki.thehammer.adapters;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,9 +58,9 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> 
 
         public ViewHolder(View itemView) {
             super(itemView);
-            //image = (TextView) itemView.findViewById(R.id.description);
-            name = (TextView) itemView.findViewById(R.id.name);
-            description = (TextView) itemView.findViewById(R.id.description);
+            //image = itemView.findViewById(R.id.description);
+            name = itemView.findViewById(R.id.name);
+            description = itemView.findViewById(R.id.description);
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

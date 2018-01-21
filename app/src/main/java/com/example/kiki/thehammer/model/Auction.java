@@ -10,12 +10,12 @@ import java.util.List;
 public class Auction {
 
     private int id;
-    public double startPrice;
-    public Date startDate;
-    public Date endDate;
-    public User user;
-    public Item item;
-    public List<Bid> bids;
+    private double startPrice;
+    private Date startDate;
+    private Date endDate;
+    private User user;
+    private Item item;
+    private List<Bid> bids;
 
     public Auction(int id, double startPrice, Date startDate, Date endDate, User user, Item item, List<Bid> bids) {
         this.id = id;

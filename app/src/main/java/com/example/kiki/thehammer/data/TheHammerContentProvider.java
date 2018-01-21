@@ -1,6 +1,7 @@
 package com.example.kiki.thehammer.data;
 
 import android.content.ContentProvider;
+import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.UriMatcher;
@@ -109,7 +110,7 @@ public class TheHammerContentProvider extends ContentProvider {
             case ITEM:
                 rowId = db.insertOrThrow(TheHammerContract.BidTable.BID, null, values);
                 getContext().getContentResolver().notifyChange(uri, null);
-                return ContentUris.withAppendedId(TheHammerContract.BidTable.CONTENT_URI, rowId);
+                return ContentUris.withAppendedId(TheHammerContract.ItemTable.CONTENT_URI, rowId);
             default:
                 throw new IllegalArgumentException("Unknown URI: " + uri);
         }
@@ -121,7 +122,7 @@ public class TheHammerContentProvider extends ContentProvider {
 
         int uriType = URI_MATCHER.match(uri);
 
-        int updateCount = 0;
+        int updateCount;
 
         switch (uriType) {
             case USER:
@@ -182,7 +183,7 @@ public class TheHammerContentProvider extends ContentProvider {
 
         int uriType = URI_MATCHER.match(uri);
 
-        int deleteCount = 0;
+        int deleteCount;
 
         switch (uriType) {
             case USER:
@@ -255,40 +256,33 @@ public class TheHammerContentProvider extends ContentProvider {
                 queryBuilder.setTables(TheHammerContract.UserTable.USER);
                 break;
             case USER_ID:
-                // Set the table name
                 queryBuilder.setTables(TheHammerContract.UserTable.USER);
                 selection = TheHammerContract.UserTable.USER_ID + " = ? ";
                 id = uri.getLastPathSegment();
                 selectionArgs = new String[] {id};
                 break;
             case AUCTION:
-                // Set the table name
                 queryBuilder.setTables(TheHammerContract.AuctionTable.AUCTION);
                 break;
             case AUCTION_ID:
-                // Set the table name
                 queryBuilder.setTables(TheHammerContract.AuctionTable.AUCTION);
                 selection = TheHammerContract.AuctionTable.AUCTION_ID + " = ? ";
                 id = uri.getLastPathSegment();
                 selectionArgs = new String[] {id};
                 break;
             case BID:
-                // Set the table name
                 queryBuilder.setTables(TheHammerContract.BidTable.BID);
                 break;
             case BID_ID:
-                // Set the table name
                 queryBuilder.setTables(TheHammerContract.BidTable.BID);
                 selection = TheHammerContract.BidTable.BID_ID + " = ? ";
                 id = uri.getLastPathSegment();
                 selectionArgs = new String[] {id};
                 break;
             case ITEM:
-                // Set the table name
                 queryBuilder.setTables(TheHammerContract.ItemTable.ITEM);
                 break;
             case ITEM_ID:
-                // Set the table name
                 queryBuilder.setTables(TheHammerContract.ItemTable.ITEM);
                 selection = TheHammerContract.ItemTable.ITEM_ID + " = ? ";
                 id = uri.getLastPathSegment();

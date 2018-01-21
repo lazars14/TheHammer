@@ -30,12 +30,12 @@ public class NavigationHelper {
         initUserInfo();
     }
 
-    public void getViewsForUserInfo(){
+    private void getViewsForUserInfo(){
         View headerView = navigationView.getHeaderView(0);
         // image to do
-        firstAndLastname = (TextView) headerView.findViewById(R.id.first_and_last_name);
-        email = (TextView) headerView.findViewById(R.id.email);
-        address = (TextView) headerView.findViewById(R.id.address);
+        firstAndLastname = headerView.findViewById(R.id.first_and_last_name);
+        email = headerView.findViewById(R.id.email);
+        address = headerView.findViewById(R.id.address);
     }
 
     public void initUserInfo(){

@@ -1,33 +1,26 @@
 package com.example.kiki.thehammer.fragments;
 
 import android.content.ContentResolver;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.InputFilter;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.NumberPicker;
 import android.widget.Toast;
 
 import com.example.kiki.thehammer.R;
 import com.example.kiki.thehammer.adapters.BidsAdapter;
 import com.example.kiki.thehammer.data.TheHammerContract;
+import com.example.kiki.thehammer.helpers.DateHelper;
 import com.example.kiki.thehammer.model.Bid;
-import com.example.kiki.thehammer.model.Item;
 import com.example.kiki.thehammer.model.User;
 
 import java.text.ParseException;
@@ -81,11 +74,10 @@ public class ItemBidsFragment extends Fragment {
             }
         });
 
-        FloatingActionButton fab = (FloatingActionButton) v.findViewById(R.id.fab);
+        FloatingActionButton fab = v.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Toast.makeText(getContext(), "Bid successfull", Toast.LENGTH_SHORT).show();
 
                 AlertDialog.Builder add_bid_dialog_builder = new AlertDialog.Builder(
                         getContext());
@@ -95,7 +87,7 @@ public class ItemBidsFragment extends Fragment {
                 LayoutInflater inflater = getActivity().getLayoutInflater();
                 View dialogView = inflater.inflate(R.layout.dialog_add_bid, null);
 
-                final NumberPicker euro_picker = (NumberPicker) dialogView.findViewById(R.id.euro_picker);
+                final NumberPicker euro_picker = dialogView.findViewById(R.id.euro_picker);
                 double min_price;
                 if(bids.size() > 0) min_price = bids.get(0).getPrice();
                 else min_price = start_price - 1;
@@ -105,7 +97,7 @@ public class ItemBidsFragment extends Fragment {
                 euro_picker.setMinValue(min_price_int);
                 euro_picker.setMaxValue(min_price_int + 1000);
 
-                final NumberPicker cent_picker = (NumberPicker) dialogView.findViewById(R.id.cent_picker);
+                final NumberPicker cent_picker = dialogView.findViewById(R.id.cent_picker);
 
                 if(cents == null){
                     // ovako ili da ucitam kad ucitavam fragment
@@ -198,14 +190,8 @@ public class ItemBidsFragment extends Fragment {
                     do {
                         int bid_id = cursor.getInt(0);
                         double price = cursor.getDouble(1);
-                        String date_time_string = cursor.getString(2);
-                        Date date = null;
+                        Date date = DateHelper.stringToDate(cursor.getString(2));
                         User user = null;
-                        try {
-                            date = format.parse(date_time_string);
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
 
                         int user_id = cursor.getInt(2);
 

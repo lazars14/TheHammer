@@ -9,10 +9,10 @@ import java.util.Date;
 public class Bid {
 
     private int id;
-    public double price;
-    public Date dateTime;
-    public Auction auction;
-    public User user;
+    private double price;
+    private Date dateTime;
+    private Auction auction;
+    private User user;
 
     public Bid(int id, double price, Date dateTime, Auction auction, User user) {
         this.id = id;

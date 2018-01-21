@@ -62,7 +62,7 @@ public class FilterHelper {
     }
 
     private boolean checkIfItemValid(int i){
-        boolean valid = false;
+        boolean valid;
         valid = getComparingValueItem(i).contains(value);
 
         return valid;
@@ -86,7 +86,7 @@ public class FilterHelper {
     }
 
     private boolean checkIfAuctionValid(int i){
-        boolean valid = false;
+        boolean valid;
         if(!criteria.equals("status")){
             valid = getComparingValueAuction(i).contains(value);
         } else {
@@ -101,7 +101,7 @@ public class FilterHelper {
     }
 
     private boolean checkIfAuctionEnded(int i){
-        boolean valid = false;
+        boolean valid;
         Date now = new Date();
         if(ended){
             valid = now.after(auctions.get(i).getEndDate());

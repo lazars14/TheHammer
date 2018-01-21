@@ -1,35 +1,29 @@
 package com.example.kiki.thehammer.activities;
 
 import android.content.ContentResolver;
-import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.util.Log;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 import com.example.kiki.thehammer.R;
 import com.example.kiki.thehammer.data.TheHammerContract;
+import com.example.kiki.thehammer.helpers.DateHelper;
 import com.example.kiki.thehammer.helpers.NavigationHelper;
 import com.example.kiki.thehammer.helpers.ValuePairViewHelper;
-import com.example.kiki.thehammer.model.Bid;
-import com.example.kiki.thehammer.model.User;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.Date;
 
 public class AuctionActivity extends AppCompatActivity
@@ -56,17 +50,17 @@ public class AuctionActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auction);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(R.string.title_activity_auction);
 
-        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         navHelper = new NavigationHelper(getApplicationContext(), navigationView);
@@ -77,8 +71,8 @@ public class AuctionActivity extends AppCompatActivity
             int item_id = bundle.getInt("item_id");
 
             View item_info_view = findViewById(R.id.item_info);
-            TextView name = (TextView) item_info_view.findViewById(R.id.name);
-            TextView description = (TextView) item_info_view.findViewById(R.id.description);
+            TextView name = item_info_view.findViewById(R.id.name);
+            TextView description = item_info_view.findViewById(R.id.description);
             // image
             name.setText(bundle.getString("item_name"));
             description.setText(bundle.getString("item_description"));
@@ -90,13 +84,7 @@ public class AuctionActivity extends AppCompatActivity
 
             start_price = bundle.getDouble("auction_start_price");
 
-            Date endDate = null;
-            try {
-                SimpleDateFormat format1 = new SimpleDateFormat("dd MMM yyyy hh:mm:ss");
-                endDate = format1.parse(bundle.getString("auction_end_date"));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
+            Date endDate = DateHelper.stringToDate(bundle.getString("auction_end_date"));
             Date now = new Date();
             if(now.after(endDate)){
                 // auction over, if user won it display owner info
@@ -127,8 +115,6 @@ public class AuctionActivity extends AppCompatActivity
                     max_price = cursor.getDouble(0);
                 }
 
-
-
                 cursor.close();
 
                 return null;
@@ -147,7 +133,6 @@ public class AuctionActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -157,24 +142,11 @@ public class AuctionActivity extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        // getMenuInflater().inflate(R.menu.auction, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-//        int id = item.getItemId();
-//
-//        //noinspection SimplifiableIfStatement
-//        if (id == R.id.action_settings) {
-//            return true;
-//        }
-//
-//        return super.onOptionsItemSelected(item);
         return true;
     }
 

@@ -1,31 +1,18 @@
 package com.example.kiki.thehammer.fragments;
 
 import android.content.ContentResolver;
-import android.content.Context;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.kiki.thehammer.R;
 import com.example.kiki.thehammer.data.TheHammerContract;
 import com.example.kiki.thehammer.helpers.ValuePairViewHelper;
-import com.example.kiki.thehammer.model.Auction;
-import com.example.kiki.thehammer.model.Item;
-
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import static com.example.kiki.thehammer.helpers.ValuePairViewHelper.setLabelValuePair;
 
 public class ItemAuctionFragment extends Fragment {
 
@@ -45,8 +32,8 @@ public class ItemAuctionFragment extends Fragment {
         if (bundle != null) {
             // String item_image = bundle.getString("image");
             View item_info_view = v.findViewById(R.id.item_info);
-            TextView name = (TextView) item_info_view.findViewById(R.id.name);
-            TextView description = (TextView) item_info_view.findViewById(R.id.description);
+            TextView name = item_info_view.findViewById(R.id.name);
+            TextView description = item_info_view.findViewById(R.id.description);
             name.setText(bundle.getString("name"));
             description.setText(bundle.getString("description"));
 
@@ -75,9 +62,6 @@ public class ItemAuctionFragment extends Fragment {
                     start_price = String.valueOf(auction_cursor.getDouble(0));
                     start_date = auction_cursor.getString(1);
                     end_date = auction_cursor.getString(2);
-//                    ValuePairViewHelper.setLabelValuePair(auction_info_view, R.id.start_price, "Start Price:", String.valueOf(auction_cursor.getDouble(0)));
-//                    ValuePairViewHelper.setLabelValuePair(auction_info_view, R.id.start_date, "Start Date:", auction_cursor.getString(1));
-//                    ValuePairViewHelper.setLabelValuePair(auction_info_view, R.id.end_date, "End Date:", auction_cursor.getString(2));
                 }
                 auction_cursor.close();
 

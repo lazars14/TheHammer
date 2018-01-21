@@ -9,11 +9,11 @@ import java.util.List;
 public class Item {
 
     private int id;
-    public String name;
-    public String description;
-    public String picture;
-    public boolean sold;
-    public List<Auction> auctions;
+    private String name;
+    private String description;
+    private String picture;
+    private boolean sold;
+    private List<Auction> auctions;
 
     public Item(int id, String name, String description, String picture) {
         this.id = id;

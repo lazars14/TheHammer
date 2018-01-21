@@ -1,9 +1,7 @@
 package com.example.kiki.thehammer.adapters;
 
 import android.content.Context;
-import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,9 +9,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.kiki.thehammer.R;
-import com.example.kiki.thehammer.activities.ItemActivity;
+import com.example.kiki.thehammer.helpers.DateHelper;
 import com.example.kiki.thehammer.model.Bid;
-import com.example.kiki.thehammer.model.Item;
 
 import java.text.DateFormat;
 import java.util.List;
@@ -42,9 +39,10 @@ public class BidsAdapter extends RecyclerView.Adapter<BidsAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(BidsAdapter.ViewHolder holder, int position) {
         // holder.image. set image (get from bid - User object in bid)
-        holder.price.setText(String.valueOf(bids.get(position).getPrice()));
-        holder.date_time.setText(DateFormat.getDateTimeInstance().format(bids.get(position).getDateTime()));
-        holder.user_name.setText(bids.get(position).getUser().getName());
+        holder.bid = bids.get(position);
+        holder.price.setText(String.valueOf(holder.bid.getPrice()));
+        holder.date_time.setText(DateHelper.format.format(holder.bid.getDateTime()));
+        holder.user_name.setText(holder.bid.getUser().getName());
     }
 
     @Override
@@ -53,6 +51,8 @@ public class BidsAdapter extends RecyclerView.Adapter<BidsAdapter.ViewHolder> {
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
+
+        private Bid bid;
         private ImageView image;
         private TextView price;
         private TextView date_time;
@@ -60,10 +60,10 @@ public class BidsAdapter extends RecyclerView.Adapter<BidsAdapter.ViewHolder> {
 
         public ViewHolder(View itemView) {
             super(itemView);
-            //image = (ImageView) itemView.findViewById(R.id.description);
-            price = (TextView) itemView.findViewById(R.id.price);
-            date_time = (TextView) itemView.findViewById(R.id.date_time);
-            user_name = (TextView) itemView.findViewById(R.id.user_name);
+            //image = itemView.findViewById(R.id.description);
+            price = itemView.findViewById(R.id.price);
+            date_time = itemView.findViewById(R.id.date_time);
+            user_name = itemView.findViewById(R.id.user_name);
         }
     }
 }
