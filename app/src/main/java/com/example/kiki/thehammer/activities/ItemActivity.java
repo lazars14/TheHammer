@@ -1,6 +1,7 @@
 package com.example.kiki.thehammer.activities;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -29,17 +30,28 @@ public class ItemActivity extends AppCompatActivity
     private NavigationHelper navHelper;
     private DrawerLayout drawer;
 
+    private static final Handler handler = new Handler();
+    private final Runnable action = new Runnable() {
+        @Override
+        public void run() {
+            navHelper.initUserInfo();
+        }
+    };
+
     @Override
     public void onResume(){
         super.onResume();
 
-        navHelper.initUserInfo();
+        handler.post(action);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_item);
+
+        handler.post(action);
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(R.string.title_activity_item);

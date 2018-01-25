@@ -7,6 +7,7 @@ import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.kiki.thehammer.R;
@@ -19,9 +20,12 @@ public class NavigationHelper {
 
     private Context appContext;
     private NavigationView navigationView;
+    private ImageView image;
     private TextView firstAndLastname;
     private TextView email;
     private TextView address;
+
+    private String not_changed = "not_changed";
 
     public NavigationHelper(Context applicationContext, NavigationView navigationView){
         this.appContext = applicationContext;
@@ -32,7 +36,7 @@ public class NavigationHelper {
 
     private void getViewsForUserInfo(){
         View headerView = navigationView.getHeaderView(0);
-        // image to do
+        image = headerView.findViewById(R.id.imageView);
         firstAndLastname = headerView.findViewById(R.id.first_and_last_name);
         email = headerView.findViewById(R.id.email);
         address = headerView.findViewById(R.id.address);
@@ -42,6 +46,12 @@ public class NavigationHelper {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(appContext);
 
         String firstAndLastnameText = preferences.getString("firstname", "John") + " " + preferences.getString("lastname", "Doe");
+
+        String url = preferences.getString("image", not_changed);
+        if(url.equals(not_changed)){
+            url = String.valueOf(R.drawable.default_user_image);
+        }
+        ImageHelper.loadImage(url, appContext, image, 1);
 
         firstAndLastname.setText(firstAndLastnameText);
         email.setText(preferences.getString("email", "johndoe@gmail.com"));

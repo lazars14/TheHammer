@@ -11,7 +11,9 @@ import android.widget.TextView;
 
 import com.example.kiki.thehammer.R;
 import com.example.kiki.thehammer.activities.ItemActivity;
+import com.example.kiki.thehammer.helpers.ImageHelper;
 import com.example.kiki.thehammer.model.Item;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.List;
 
@@ -23,6 +25,7 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> 
 
     private Context context;
     private List<Item> items;
+    private StorageReference storageReference;
 
     public ItemsAdapter(Context context, List<Item> items) {
         this.context = context;
@@ -38,10 +41,10 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        // holder.image. set image
-        holder.name.setText(items.get(position).getName());
-        holder.description.setText(items.get(position).getDescription());
         holder.item = items.get(position);
+        ImageHelper.loadImage(holder.item.getPicture(), context, holder.image, 0);
+        holder.name.setText(holder.item.getName());
+        holder.description.setText(holder.item.getDescription().substring(0, 30) + "...");
     }
 
     @Override
@@ -58,7 +61,7 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> 
 
         public ViewHolder(View itemView) {
             super(itemView);
-            //image = itemView.findViewById(R.id.description);
+            image = itemView.findViewById(R.id.image);
             name = itemView.findViewById(R.id.name);
             description = itemView.findViewById(R.id.description);
             itemView.setOnClickListener(new View.OnClickListener() {
@@ -68,7 +71,7 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> 
                     intent.putExtra("id", item.getId());
                     intent.putExtra("name", item.getName());
                     intent.putExtra("description", item.getDescription());
-                    // intent.putExtra("image", item.getImage());
+                    intent.putExtra("image", item.getPicture());
                     context.startActivity(intent);
                 }
             });

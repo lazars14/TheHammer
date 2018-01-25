@@ -9,25 +9,28 @@ import java.util.List;
 
 public class Auction {
 
-    private int id;
+    private String id;
     private double startPrice;
-    private Date startDate;
-    private Date endDate;
+    private String startDate;
+    private String endDate;
     private User user;
     private Item item;
     private List<Bid> bids;
 
-    public Auction(int id, double startPrice, Date startDate, Date endDate, User user, Item item, List<Bid> bids) {
+    public Auction(){}
+
+    public Auction(String id){this.id = id;}
+
+    public Auction(String id, double startPrice, String startDate, String endDate, User user, Item item) {
         this.id = id;
         this.startPrice = startPrice;
         this.startDate = startDate;
         this.endDate = endDate;
         this.user = user;
         this.item = item;
-        this.bids = bids;
     }
 
-    public Auction(int id, double startPrice,Date startDate, Date endDate, Item item){
+    public Auction(String id, double startPrice, String startDate, String endDate, Item item){
         this.id = id;
         this.startPrice = startPrice;
         this.startDate = startDate;
@@ -35,11 +38,11 @@ public class Auction {
         this.item = item;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -51,19 +54,19 @@ public class Auction {
         this.startPrice = startPrice;
     }
 
-    public Date getStartDate() {
+    public String getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(String startDate) {
         this.startDate = startDate;
     }
 
-    public Date getEndDate() {
+    public String getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(String endDate) {
         this.endDate = endDate;
     }
 

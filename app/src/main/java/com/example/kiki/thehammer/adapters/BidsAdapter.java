@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.example.kiki.thehammer.R;
 import com.example.kiki.thehammer.helpers.DateHelper;
+import com.example.kiki.thehammer.helpers.ImageHelper;
 import com.example.kiki.thehammer.model.Bid;
 
 import java.text.DateFormat;
@@ -38,10 +39,10 @@ public class BidsAdapter extends RecyclerView.Adapter<BidsAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(BidsAdapter.ViewHolder holder, int position) {
-        // holder.image. set image (get from bid - User object in bid)
         holder.bid = bids.get(position);
+        ImageHelper.loadImage(holder.bid.getUser().getPicture(), context, holder.image, 1);
         holder.price.setText(String.valueOf(holder.bid.getPrice()));
-        holder.date_time.setText(DateHelper.format.format(holder.bid.getDateTime()));
+        holder.date_time.setText(holder.bid.getDateTime());
         holder.user_name.setText(holder.bid.getUser().getName());
     }
 
@@ -60,7 +61,7 @@ public class BidsAdapter extends RecyclerView.Adapter<BidsAdapter.ViewHolder> {
 
         public ViewHolder(View itemView) {
             super(itemView);
-            //image = itemView.findViewById(R.id.description);
+            image = itemView.findViewById(R.id.image);
             price = itemView.findViewById(R.id.price);
             date_time = itemView.findViewById(R.id.date_time);
             user_name = itemView.findViewById(R.id.user_name);

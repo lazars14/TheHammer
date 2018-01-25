@@ -8,25 +8,30 @@ import java.util.List;
 
 public class Item {
 
-    private int id;
+    private String id;
     private String name;
     private String description;
     private String picture;
     private boolean sold;
     private List<Auction> auctions;
 
-    public Item(int id, String name, String description, String picture) {
+    public Item(){}
+
+    public Item(String id){this.id = id;}
+
+    public Item(String id, String name, String description, String picture) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.picture = picture;
+        this.sold = false;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

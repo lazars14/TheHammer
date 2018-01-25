@@ -103,11 +103,12 @@ public class FilterHelper {
     private boolean checkIfAuctionEnded(int i){
         boolean valid;
         Date now = new Date();
+        Date endDate = DateHelper.stringToDate(auctions.get(i).getEndDate());
         if(ended){
-            valid = now.after(auctions.get(i).getEndDate());
+            valid = now.after(endDate);
         }
         else {
-            valid = auctions.get(i).getEndDate().after(now);
+            valid = endDate.after(now);
         }
 
         return valid;

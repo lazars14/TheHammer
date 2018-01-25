@@ -8,17 +8,27 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.kiki.thehammer.R;
 import com.example.kiki.thehammer.data.TheHammerContract;
+import com.example.kiki.thehammer.helpers.DateHelper;
+import com.example.kiki.thehammer.helpers.ImageHelper;
 import com.example.kiki.thehammer.helpers.ValuePairViewHelper;
+import com.example.kiki.thehammer.model.Auction;
+import com.example.kiki.thehammer.services.AuctionService;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.Date;
 
 public class ItemAuctionFragment extends Fragment {
 
     private View auction_info_view;
     private int item_id;
-    private String start_price, start_date, end_date;
 
     public ItemAuctionFragment() {
         // Required empty public constructor
@@ -30,13 +40,15 @@ public class ItemAuctionFragment extends Fragment {
         View v = inflater.inflate(R.layout.item_auction_fragment, container, false);
         Bundle bundle = getActivity().getIntent().getExtras();
         if (bundle != null) {
-            // String item_image = bundle.getString("image");
+            String item_image = bundle.getString("image");
             View item_info_view = v.findViewById(R.id.item_info);
             TextView name = item_info_view.findViewById(R.id.name);
             TextView description = item_info_view.findViewById(R.id.description);
+            ImageView imageView = item_info_view.findViewById(R.id.image);
+
             name.setText(bundle.getString("name"));
             description.setText(bundle.getString("description"));
-
+            ImageHelper.loadImage(item_image, getContext(), imageView, 0);
             auction_info_view = v.findViewById(R.id.auction_info);
 
             item_id = bundle.getInt("id");
@@ -50,32 +62,36 @@ public class ItemAuctionFragment extends Fragment {
         AsyncTask<Integer,Void,Void> task = new AsyncTask<Integer, Void, Void>() {
             @Override
             protected Void doInBackground(Integer... integers) {
-                ContentResolver resolver = getActivity().getContentResolver();
-                Cursor auction_cursor = resolver.query(TheHammerContract.AuctionTable.CONTENT_URI,
-                        new String[]{TheHammerContract.AuctionTable.AUCTION_START_PRICE,
-                                    TheHammerContract.AuctionTable.AUCTION_START_DATE,
-                                    TheHammerContract.AuctionTable.AUCTION_END_DATE},
-                        TheHammerContract.AuctionTable.AUCTION_ITEM_ID + " = ?",
-                        new String[]{String.valueOf(item_id)},
-                        null);
-                if (auction_cursor.moveToFirst()){
-                    start_price = String.valueOf(auction_cursor.getDouble(0));
-                    start_date = auction_cursor.getString(1);
-                    end_date = auction_cursor.getString(2);
-                }
-                auction_cursor.close();
+                Query query = AuctionService.ALL_AUCTIONS_QUERY;
+                final Date now = new Date();
+                query.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for(DataSnapshot auctionSnapshot : dataSnapshot.getChildren()){
+                            Auction auction = auctionSnapshot.getValue(Auction.class);
+
+                            if(auction.getItem().getId().equals(item_id) && DateHelper.stringToDate(auction.getEndDate()).after(now)){
+                                setAuctionInfo(auction);
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
 
                 return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                ValuePairViewHelper.setLabelValuePair(auction_info_view, R.id.start_price, "Start Price:", start_price);
-                ValuePairViewHelper.setLabelValuePair(auction_info_view, R.id.start_date, "Start Date:", start_date);
-                ValuePairViewHelper.setLabelValuePair(auction_info_view, R.id.end_date, "End Date:", end_date);
             }
         };
 
         task.execute();
+    }
+
+    private void setAuctionInfo(Auction auction){
+        ValuePairViewHelper.setLabelValuePair(auction_info_view, R.id.start_price, "Start Price:", String.valueOf(auction.getStartPrice()));
+        ValuePairViewHelper.setLabelValuePair(auction_info_view, R.id.start_date, "Start Date:", auction.getStartDate());
+        ValuePairViewHelper.setLabelValuePair(auction_info_view, R.id.end_date, "End Date:", auction.getEndDate());
     }
 }

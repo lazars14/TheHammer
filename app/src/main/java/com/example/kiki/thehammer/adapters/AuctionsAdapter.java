@@ -2,6 +2,7 @@ package com.example.kiki.thehammer.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.media.Image;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,9 +13,11 @@ import android.widget.TextView;
 import com.example.kiki.thehammer.R;
 import com.example.kiki.thehammer.activities.AuctionActivity;
 import com.example.kiki.thehammer.helpers.DateHelper;
+import com.example.kiki.thehammer.helpers.ImageHelper;
 import com.example.kiki.thehammer.model.Auction;
 
 import java.text.DateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -40,12 +43,12 @@ public class AuctionsAdapter extends RecyclerView.Adapter<AuctionsAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(AuctionsAdapter.ViewHolder holder, int position) {
-        // set image
         holder.auction = auctions.get(position);
+        ImageHelper.loadImage(holder.auction.getItem().getPicture(), context, holder.item_image, 0);
         holder.item_name.setText(holder.auction.getItem().getName());
-        holder.item_description.setText(holder.auction.getItem().getDescription());
-        holder.start_price.setText("Start: " + holder.auction.getStartPrice());
-        holder.end_date.setText("End: " + DateHelper.format.format(holder.auction.getEndDate()));
+        holder.item_description.setText(holder.auction.getItem().getDescription().substring(0, 20) + "...");
+        holder.start_price.setText("Start price: " + holder.auction.getStartPrice());
+        holder.end_date.setText("End: " + DateHelper.calculateRemainingTime(DateHelper.stringToDate(holder.auction.getEndDate())));
     }
 
     @Override
@@ -64,7 +67,7 @@ public class AuctionsAdapter extends RecyclerView.Adapter<AuctionsAdapter.ViewHo
 
         public ViewHolder(View auctionView) {
             super(auctionView);
-            //item_image = itemView.findViewById(R.id.item_image);
+            item_image = itemView.findViewById(R.id.image);
             item_name = auctionView.findViewById(R.id.item_name);
             item_description = auctionView.findViewById(R.id.item_description);
             start_price = auctionView.findViewById(R.id.start_price);
@@ -75,8 +78,8 @@ public class AuctionsAdapter extends RecyclerView.Adapter<AuctionsAdapter.ViewHo
                     Intent intent = new Intent(context, AuctionActivity.class);
                     intent.putExtra("auction_id", auction.getId());
                     intent.putExtra("auction_start_price", auction.getStartPrice());
-                    intent.putExtra("auction_start_date", DateHelper.format.format(auction.getStartDate()));
-                    intent.putExtra("auction_end_date", DateHelper.format.format(auction.getEndDate()));
+                    intent.putExtra("auction_start_date", auction.getStartDate());
+                    intent.putExtra("auction_end_date", auction.getEndDate());
                     intent.putExtra("item_id", auction.getItem().getId());
                     intent.putExtra("item_name", auction.getItem().getName());
                     intent.putExtra("item_description", auction.getItem().getDescription());

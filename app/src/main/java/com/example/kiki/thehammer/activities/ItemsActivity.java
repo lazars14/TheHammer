@@ -4,6 +4,7 @@ import android.content.ContentResolver;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -22,9 +23,25 @@ import android.widget.Spinner;
 import com.example.kiki.thehammer.R;
 import com.example.kiki.thehammer.adapters.ItemsAdapter;
 import com.example.kiki.thehammer.data.TheHammerContract;
+import com.example.kiki.thehammer.helpers.DataInitHelper;
+import com.example.kiki.thehammer.helpers.DateHelper;
+import com.example.kiki.thehammer.helpers.DummyData;
 import com.example.kiki.thehammer.helpers.FilterHelper;
 import com.example.kiki.thehammer.helpers.NavigationHelper;
+import com.example.kiki.thehammer.model.Auction;
+import com.example.kiki.thehammer.model.Bid;
 import com.example.kiki.thehammer.model.Item;
+import com.example.kiki.thehammer.model.User;
+import com.example.kiki.thehammer.services.AuctionService;
+import com.example.kiki.thehammer.services.BidService;
+import com.example.kiki.thehammer.services.ItemService;
+import com.example.kiki.thehammer.services.UserService;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,24 +59,32 @@ public class ItemsActivity extends AppCompatActivity implements NavigationView.O
     private Spinner spinner;
     private EditText filter_text;
 
+    private static final Handler handler = new Handler();
+    private final Runnable action = new Runnable() {
+        @Override
+        public void run() {
+            // refresh data
+            navHelper.initUserInfo();
+            setRecyclerView();
+        }
+    };
+
+    private DatabaseReference ref;
+
     private FilterHelper filterHelper;
 
     @Override
     public void onResume(){
         super.onResume();
 
-        navHelper.initUserInfo();
-    }
-
-    private void refreshItems(){
-        items = new ArrayList<>();
-        load_data_from_content_provider(0);
+        handler.post(action);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_items);
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(R.string.title_activity_items);
@@ -77,56 +102,48 @@ public class ItemsActivity extends AppCompatActivity implements NavigationView.O
         setSpinnerData();
 
         recyclerView = findViewById(R.id.recycler_view);
-        load_data_from_content_provider(0);
 
         gridLayoutManager = new GridLayoutManager(this,1);
         recyclerView.setLayoutManager(gridLayoutManager);
 
         setRecyclerView();
+        load_items_from_firebase();
+//        DataInitHelper.initDummyData();
     }
 
-    private void load_data_from_content_provider(int id) {
+    private void load_items_from_firebase() {
 
         AsyncTask<Integer,Void,Void> task = new AsyncTask<Integer, Void, Void>() {
             @Override
             protected Void doInBackground(Integer... integers) {
-                String selection = TheHammerContract.ItemTable.ITEM_ID + " BETWEEN ? AND ? AND " + TheHammerContract.ItemTable.ITEM_SOLD + " = 0";
-                String[] selectionArgs = new String[]{ String.valueOf(integers[0] + 1), String.valueOf(integers[0] + 6)};
-                ContentResolver resolver = getContentResolver();
-                Cursor cursor =
-                        resolver.query(TheHammerContract.ItemTable.CONTENT_URI,
-                                null,
-                                selection,
-                                 selectionArgs,
-                                null);
-                if (cursor.moveToFirst()) {
-                    do {
-                        int itemId = cursor.getInt(0);
-                        String name = cursor.getString(1);
-                        String description = cursor.getString(2);
-                        String image = cursor.getString(3);
+//                Query reference = FirebaseDatabase.getInstance().getReference("items").orderByChild("name").equalTo(false, "sold").limitToFirst(3).startAt(0);
 
-                        Item item = new Item(itemId, name, description, image);
-                        items.add(item);
+                Query reference = ItemService.ALL_ITEMS_QUERY;
 
-                    } while (cursor.moveToNext());
+                reference.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for(DataSnapshot itemSnapshot : dataSnapshot.getChildren()){
+                            Item item = itemSnapshot.getValue(Item.class);
 
-                    cursor.close();
-                }
+                            items.add(item);
+
+                            adapter.notifyDataSetChanged();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
 
                 return null;
             }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                adapter.notifyDataSetChanged();
-            }
         };
 
-        task.execute(id);
+        task.execute();
     }
-
-
 
     public void setSpinnerData(){
         View filter_view = findViewById(R.id.items_filter);
@@ -196,16 +213,16 @@ public class ItemsActivity extends AppCompatActivity implements NavigationView.O
         adapter = new ItemsAdapter(this, items);
         recyclerView.setAdapter(adapter);
 
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-
-                if(gridLayoutManager.findLastCompletelyVisibleItemPosition() == items.size()-1){
-                    load_data_from_content_provider(items.get(items.size() - 1).getId());
-                }
-
-            }
-        });
+//        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+//            @Override
+//            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+//
+//                if(gridLayoutManager.findLastCompletelyVisibleItemPosition() == items.size()-1){
+//                    load_data_from_content_provider(items.get(items.size() - 1).getId());
+//                }
+//
+//            }
+//        });
     }
 
 

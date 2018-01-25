@@ -20,8 +20,16 @@ import com.example.kiki.thehammer.R;
 import com.example.kiki.thehammer.adapters.BidsAdapter;
 import com.example.kiki.thehammer.data.TheHammerContract;
 import com.example.kiki.thehammer.helpers.DateHelper;
+import com.example.kiki.thehammer.helpers.DummyData;
+import com.example.kiki.thehammer.model.Auction;
 import com.example.kiki.thehammer.model.Bid;
 import com.example.kiki.thehammer.model.User;
+import com.example.kiki.thehammer.services.AuctionService;
+import com.example.kiki.thehammer.services.BidService;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -33,15 +41,17 @@ public class ItemBidsFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private GridLayoutManager gridLayoutManager;
+    private FloatingActionButton fab;
     private BidsAdapter adapter;
     private List<Bid> bids = new ArrayList<>();
+    private AuctionService auctionService = new AuctionService();
+    private BidService bidService = new BidService();
 
-    private int item_id;
-    private int auction_id;
+    private String item_id;
+    private String auction_id;
     private Date end_date;
     private double start_price;
     private String[] cents;
-    private final SimpleDateFormat format = new SimpleDateFormat("DD/MM/yyyy hh:mm");
 
     public ItemBidsFragment() {
         // Required empty public constructor
@@ -53,11 +63,10 @@ public class ItemBidsFragment extends Fragment {
         View v = inflater.inflate(R.layout.item_bids_fragment, container, false);
         Bundle bundle = getActivity().getIntent().getExtras();
         if (bundle != null) {
-            item_id = bundle.getInt("id");
+            item_id = bundle.getString("id");
         }
 
         recyclerView = v.findViewById(R.id.recycler_view);
-        load_data_from_content_provider(0);
 
         gridLayoutManager = new GridLayoutManager(getContext(),1);
         recyclerView.setLayoutManager(gridLayoutManager);
@@ -65,16 +74,108 @@ public class ItemBidsFragment extends Fragment {
         adapter = new BidsAdapter(getContext(), bids);
         recyclerView.setAdapter(adapter);
 
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                if(gridLayoutManager.findLastCompletelyVisibleItemPosition() == bids.size()-1){
-                    load_data_from_content_provider(bids.get(bids.size() - 1).getId());
-                }
-            }
-        });
+        fab = v.findViewById(R.id.fab);
 
-        FloatingActionButton fab = v.findViewById(R.id.fab);
+        load_bids_from_firebase();
+
+        return v;
+    }
+
+    private void load_bids_from_firebase(){
+        final Date now = new Date();
+
+        AsyncTask<Integer,Void,Void> task = new AsyncTask<Integer, Void, Void>() {
+            @Override
+            protected Void doInBackground(Integer... integers) {
+//                Query query = auctionService.ALL_AUCTIONS_QUERY;
+//                query.addValueEventListener(new ValueEventListener() {
+//                    @Override
+//                    public void onDataChange(DataSnapshot dataSnapshot) {
+//                        for(DataSnapshot auctionSnapshot : dataSnapshot.getChildren()){
+//                            Auction auction = auctionSnapshot.getValue(Auction.class);
+//                            if(auction.getItem().getId().equals(item_id) && DateHelper.stringToDate(auction.getEndDate()).after(now)){
+//                                auction_id = auction.getId();
+//
+//                                Query bidQuery = bidService.getAllBidsDbReference().orderByChild("price");
+//
+//                                bidQuery.addValueEventListener(new ValueEventListener() {
+//                                    @Override
+//                                    public void onDataChange(DataSnapshot dataSnapshot) {
+//                                        for(DataSnapshot bidSnapshot : dataSnapshot.getChildren()){
+//                                            Bid bid = bidSnapshot.getValue(Bid.class);
+//
+//                                            bids.add(bid);
+//                                            adapter.notifyDataSetChanged();
+//                                        }
+//
+//                                        setOnClickListenerForButton();
+//                                    }
+//
+//                                    @Override
+//                                    public void onCancelled(DatabaseError databaseError) {
+//
+//                                    }
+//                                });
+//                            }
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(DatabaseError databaseError) {
+//
+//                    }
+//                });
+
+                Query query = auctionService.ALL_AUCTIONS_QUERY;
+                query.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for(DataSnapshot auctionSnapshot : dataSnapshot.getChildren()){
+                            Auction auction = auctionSnapshot.getValue(Auction.class);
+                            if(auction.getItem().getId().equals(item_id)){
+                                auction_id = auction.getId();
+                                end_date = DateHelper.stringToDate(auction.getEndDate());
+
+                                Query bidQuery = bidService.getAllBidsDbReference().orderByChild("price");
+
+                                bidQuery.addValueEventListener(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        for(DataSnapshot bidSnapshot : dataSnapshot.getChildren()){
+                                            Bid bid = bidSnapshot.getValue(Bid.class);
+
+                                            if(bid.getAuction().getId().equals(auction_id)){
+                                                bids.add(bid);
+                                                adapter.notifyDataSetChanged();
+                                            }
+                                        }
+
+                                        setOnClickListenerForButton();
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                    }
+                                });
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+                return null;
+            }
+        };
+
+        task.execute();
+    }
+
+    private void setOnClickListenerForButton(){
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -99,13 +200,10 @@ public class ItemBidsFragment extends Fragment {
 
                 final NumberPicker cent_picker = dialogView.findViewById(R.id.cent_picker);
 
-                if(cents == null){
-                    // ovako ili da ucitam kad ucitavam fragment
-                    cents = new String[100];
-                    for(int i = 0; i < 100; i++){
-                        if(i < 10) cents[i] = "0" + i;
-                        else cents[i] = String.valueOf(i);
-                    }
+                cents = new String[100];
+                for(int i = 0; i < 100; i++){
+                    if(i < 10) cents[i] = "0" + i;
+                    else cents[i] = String.valueOf(i);
                 }
 
                 cent_picker.setDisplayedValues(cents);
@@ -121,21 +219,28 @@ public class ItemBidsFragment extends Fragment {
                         .setCancelable(false)
                         .setPositiveButton("Ok",new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog,int id) {
-                                Date now = new Date();
-                                if(now.after(end_date)){
-                                    // auction over
-                                    Toast.makeText(getContext(), "Bid failed - auction over", Toast.LENGTH_SHORT).show();
-                                } else {
-                                    // auction still in progress, bid successfull
-                                    double euros = euro_picker.getValue();
-                                    double cents = cent_picker.getValue();
-                                    double euro_cents = euros + cents/100;
-                                    boolean valid = true;
-                                    // dodavanje na firebase
-                                    if(valid) Toast.makeText(getContext(), "Bid successfull", Toast.LENGTH_SHORT).show();
-                                    else Toast.makeText(getContext(), "Bid failed - server error", Toast.LENGTH_SHORT).show();
-                                    // trebao bi da uzmem error sa servera da ispisem tacno koji je
-                                }
+//                                boolean auctionEnded = DateHelper.auctionEnded(end_date);
+//                                if(auctionEnded){
+////                                    Toast.makeText(getContext(), "Bid failed - auction over", Toast.LENGTH_SHORT).show();
+//                                    Toast.makeText(getContext(), DateHelper.dateToString(end_date), Toast.LENGTH_LONG).show();
+//                                } else {
+//                                    double euros = euro_picker.getValue();
+//                                    double cents = cent_picker.getValue();
+//                                    double euro_cents = euros + cents/100;
+//                                    boolean valid = true;
+//
+//                                    BidService bidService = new BidService();
+//                                    bidService.addBid(euro_cents, DateHelper.dateToString(new Date()), new Auction(auction_id), new User(DummyData.user_id));
+//
+//                                    if(valid) Toast.makeText(getContext(), "Bid successfull", Toast.LENGTH_SHORT).show();
+//                                    else Toast.makeText(getContext(), "Bid failed - server error", Toast.LENGTH_SHORT).show();
+//                                }
+                                double euros = euro_picker.getValue();
+                                double cents = cent_picker.getValue();
+                                double euro_cents = euros + cents/100;
+
+                                BidService bidService = new BidService();
+                                bidService.addBid(euro_cents, DateHelper.dateToString(new Date()), new Auction(auction_id), new User(DummyData.user_id));
                             }
                         })
                         .setNegativeButton("Cancel",new DialogInterface.OnClickListener() {
@@ -151,81 +256,5 @@ public class ItemBidsFragment extends Fragment {
                 add_bid_dialog.show();
             }
         });
-
-        return v;
-    }
-
-    private void load_data_from_content_provider(int id){
-        AsyncTask<Integer,Void,Void> task = new AsyncTask<Integer, Void, Void>() {
-            @Override
-            protected Void doInBackground(Integer... integers) {
-                ContentResolver resolver = getActivity().getContentResolver();
-                Cursor auction_cursor = resolver.query(TheHammerContract.AuctionTable.CONTENT_URI,
-                        new String[]{TheHammerContract.AuctionTable.AUCTION_ID,
-                                TheHammerContract.AuctionTable.AUCTION_END_DATE,
-                                TheHammerContract.AuctionTable.AUCTION_START_PRICE},
-                        TheHammerContract.AuctionTable.AUCTION_ITEM_ID + " = ?",
-                        new String[]{String.valueOf(item_id)},
-                        null);
-                if (auction_cursor.moveToFirst()){
-                    auction_id = auction_cursor.getInt(0);
-                    try {
-                        end_date = format.parse(auction_cursor.getString(1));
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-                    start_price = auction_cursor.getDouble(2);
-                }
-                auction_cursor.close();
-
-                String selection = TheHammerContract.BidTable.BID_AUCTION_ID + " = ? AND " + TheHammerContract.BidTable.BID_ID + " BETWEEN ? AND ?";
-                String[] selectionArgs = new String[]{ String.valueOf(auction_id), String.valueOf(integers[0] + 1), String.valueOf(integers[0] + 6)};
-                Cursor cursor =
-                        resolver.query(TheHammerContract.BidTable.CONTENT_URI,
-                                null,
-                                selection,
-                                selectionArgs,
-                                TheHammerContract.BidTable.BID_PRICE + " DESC");
-                if (cursor.moveToFirst()) {
-                    do {
-                        int bid_id = cursor.getInt(0);
-                        double price = cursor.getDouble(1);
-                        Date date = DateHelper.stringToDate(cursor.getString(2));
-                        User user = null;
-
-                        int user_id = cursor.getInt(2);
-
-                        Cursor user_cursor =
-                                resolver.query(TheHammerContract.UserTable.CONTENT_URI,
-                                        new String[]{TheHammerContract.UserTable.USER_NAME,
-                                                    TheHammerContract.UserTable.USER_PICTURE},
-                                        TheHammerContract.UserTable.USER_ID + " = ?",
-                                        new String[]{String.valueOf(user_id)},
-                                        null);
-                        if (user_cursor.moveToFirst()){
-                            String user_name = user_cursor.getString(0);
-                            String user_picture = user_cursor.getString(1);
-                            user = new User(user_id, user_name, user_picture);
-                        }
-                        Bid bid = new Bid(bid_id, price, date, user);
-                        bids.add(bid);
-
-                        user_cursor.close();
-
-                    } while (cursor.moveToNext());
-
-                    cursor.close();
-                }
-
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                adapter.notifyDataSetChanged();
-            }
-        };
-
-        task.execute(id);
     }
 }

@@ -1,9 +1,12 @@
 package com.example.kiki.thehammer.activities;
 
 import android.content.ContentResolver;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -25,10 +28,20 @@ import com.example.kiki.thehammer.R;
 import com.example.kiki.thehammer.adapters.AuctionsAdapter;
 import com.example.kiki.thehammer.data.TheHammerContract;
 import com.example.kiki.thehammer.helpers.DateHelper;
+import com.example.kiki.thehammer.helpers.DummyData;
 import com.example.kiki.thehammer.helpers.FilterHelper;
 import com.example.kiki.thehammer.helpers.NavigationHelper;
 import com.example.kiki.thehammer.model.Auction;
+import com.example.kiki.thehammer.model.Bid;
 import com.example.kiki.thehammer.model.Item;
+import com.example.kiki.thehammer.services.AuctionService;
+import com.example.kiki.thehammer.services.BidService;
+import com.example.kiki.thehammer.services.ItemService;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -43,7 +56,6 @@ public class AuctionsActivity extends AppCompatActivity
     private GridLayoutManager gridLayoutManager;
     private AuctionsAdapter adapter;
     private List<Auction> auctions = new ArrayList<>();
-    private final SimpleDateFormat format = new SimpleDateFormat("DD/mm/yyyy hh:mm");
 
     private NavigationHelper navHelper;
     private DrawerLayout drawer;
@@ -54,23 +66,44 @@ public class AuctionsActivity extends AppCompatActivity
 
     private FilterHelper filterHelper;
 
+    private SharedPreferences preferences;
+    private String user_id;
+
+    private AuctionService auctionService = new AuctionService();
+    private ItemService itemService = new ItemService();
+
+    private static final Handler handler = new Handler();
+    private final Runnable action = new Runnable() {
+        @Override
+        public void run() {
+            // refresh data
+            navHelper.initUserInfo();
+            setRecyclerView();
+        }
+    };
+
+
     @Override
     public void onResume(){
         super.onResume();
 
-        navHelper.initUserInfo();
+        handler.post(action);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auctions);
+
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        handler.post(action);
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(R.string.title_activity_auctions);
 
         recyclerView = findViewById(R.id.recycler_view);
-        load_data_from_content_provider(0);
 
         gridLayoutManager = new GridLayoutManager(this,1);
         recyclerView.setLayoutManager(gridLayoutManager);
@@ -88,71 +121,78 @@ public class AuctionsActivity extends AppCompatActivity
 
         navHelper = new NavigationHelper(getApplicationContext(), navigationView);
         setSpinnerData();
+
+        setRecyclerView();
+        user_id = preferences.getString("user_id", DummyData.user_id);
+        load_auctions_from_content_provider();
     }
 
-    private void load_data_from_content_provider(int id){
+    private void load_auctions_from_content_provider(){
         AsyncTask<Integer,Void,Void> task = new AsyncTask<Integer, Void, Void>() {
+
             @Override
             protected Void doInBackground(Integer... integers) {
-                String[] projection = new String[]{TheHammerContract.AuctionTable.AUCTION_ID,
-                                                    TheHammerContract.AuctionTable.AUCTION_START_PRICE,
-                                                    TheHammerContract.AuctionTable.AUCTION_START_DATE,
-                                                    TheHammerContract.AuctionTable.AUCTION_END_DATE,
-                                                    TheHammerContract.AuctionTable.AUCTION_ITEM_ID};
-                String selection = TheHammerContract.ItemTable.ITEM_ID + " BETWEEN ? AND ?";
-                String[] selectionArgs = new String[]{ String.valueOf(integers[0] + 1), String.valueOf(integers[0] + 6)};
-                ContentResolver resolver = getContentResolver();
-                Cursor cursor =
-                        resolver.query(TheHammerContract.AuctionTable.CONTENT_URI,
-                                projection,
-                                selection,
-                                selectionArgs,
-                                null);
-                if (cursor.moveToFirst()) {
-                    do {
-                        int auction_id = cursor.getInt(0);
-                        Double start_price = cursor.getDouble(1);
-                        int item_id = cursor.getInt(4);
+                BidService bidService = new BidService();
+                Query query = bidService.getAllBidsDbReference();
 
-                        Date start_date = DateHelper.stringToDate(cursor.getString(2));
-                        Date end_date = DateHelper.stringToDate(cursor.getString(3));
-                        Item item = null;
+                query.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for(DataSnapshot bidSnapshot : dataSnapshot.getChildren()){
+                            Bid bid = bidSnapshot.getValue(Bid.class);
 
-                        Cursor item_cursor =
-                                resolver.query(TheHammerContract.ItemTable.CONTENT_URI,
-                                        new String[]{TheHammerContract.ItemTable.ITEM_NAME,
-                                                TheHammerContract.ItemTable.ITEM_DESCRIPTION,
-                                                TheHammerContract.ItemTable.ITEM_PICTURE},
-                                        TheHammerContract.ItemTable.ITEM_ID + " = ?",
-                                        new String[]{String.valueOf(item_id)},
-                                        null);
-                        if(item_cursor.moveToFirst()){
-                            String item_name = cursor.getString(0);
-                            String item_description = cursor.getString(1);
-                            String item_picture = cursor.getString(2);
+                            if(bid.getUser().getId().equals(user_id)){
+                                Query q = auctionService.getAuctionById(bid.getAuction().getId());
 
-                            item = new Item(item_id, item_name, item_description, item_picture);
+                                q.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        final Auction auction = dataSnapshot.getValue(Auction.class);
+                                        if(!auctions.contains(auction)){
+
+                                            Query itemQuery = itemService.getReferenceForItemById(auction.getItem().getId());
+
+                                            itemQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                                    Item item = dataSnapshot.getValue(Item.class);
+                                                    auction.setItem(item);
+
+                                                    auctions.add(auction);
+                                                    adapter.notifyDataSetChanged();
+                                                }
+
+                                                @Override
+                                                public void onCancelled(DatabaseError databaseError) {
+
+                                                }
+                                            });
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                    }
+                                });
+                            }
                         }
-                        Auction auction = new Auction(auction_id, start_price, start_date, end_date, item);
-                        auctions.add(auction);
 
-                        item_cursor.close();
+                    }
 
-                    } while (cursor.moveToNext());
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
 
-                    cursor.close();
-                }
+                    }
+                });
+
 
                 return null;
             }
 
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                adapter.notifyDataSetChanged();
-            }
         };
 
-        task.execute(id);
+        task.execute();
     }
 
     public void setSpinnerData(){
@@ -240,15 +280,15 @@ public class AuctionsActivity extends AppCompatActivity
         adapter = new AuctionsAdapter(this, auctions);
         recyclerView.setAdapter(adapter);
 
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-
-                if(gridLayoutManager.findLastCompletelyVisibleItemPosition() == auctions.size()-1){
-                    load_data_from_content_provider(auctions.get(auctions.size() - 1).getId());
-                }
-
-            }
-        });
+//        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+//            @Override
+//            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+//
+//                if(gridLayoutManager.findLastCompletelyVisibleItemPosition() == auctions.size()-1){
+//                    load_data_from_content_provider(auctions.get(auctions.size() - 1).getId());
+//                }
+//
+//            }
+//        });
     }
 }

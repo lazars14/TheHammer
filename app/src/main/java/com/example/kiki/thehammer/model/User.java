@@ -8,7 +8,7 @@ import java.util.List;
 
 public class User {
 
-    private int id;
+    private String id;
     private String name;
     private String email;
     private String password;
@@ -18,7 +18,11 @@ public class User {
     private List<Auction> auctions;
     private List<Bid> bids;
 
-    public User(int id, String name, String email, String password, String picture, String address, String phone, List<Auction> auctions, List<Bid> bids){
+    public User(){}
+
+    public User(String id){this.id = id;}
+
+    public User(String id, String name, String email, String password, String picture, String address, String phone){
         this.id = id;
         this.name = name;
         this.email = email;
@@ -26,21 +30,19 @@ public class User {
         this.picture = picture;
         this.address = address;
         this.phone = phone;
-        this.auctions = auctions;
-        this.bids = bids;
     }
 
-    public User(int id, String name, String picture){
+    public User(String id, String name, String picture){
         this.id = id;
         this.name = name;
         this.picture = picture;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
