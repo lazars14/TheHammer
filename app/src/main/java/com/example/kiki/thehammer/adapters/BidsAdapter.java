@@ -42,7 +42,7 @@ public class BidsAdapter extends RecyclerView.Adapter<BidsAdapter.ViewHolder> {
         holder.bid = bids.get(position);
         ImageHelper.loadImage(holder.bid.getUser().getPicture(), context, holder.image, 1);
         holder.price.setText(String.valueOf(holder.bid.getPrice()));
-        holder.date_time.setText(holder.bid.getDateTime());
+        holder.date_time.setText(DateHelper.dateToString(holder.bid.getDateTime()));
         holder.user_name.setText(holder.bid.getUser().getName());
     }
 

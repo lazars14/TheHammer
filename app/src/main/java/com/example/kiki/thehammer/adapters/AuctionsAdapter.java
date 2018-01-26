@@ -48,7 +48,7 @@ public class AuctionsAdapter extends RecyclerView.Adapter<AuctionsAdapter.ViewHo
         holder.item_name.setText(holder.auction.getItem().getName());
         holder.item_description.setText(holder.auction.getItem().getDescription().substring(0, 20) + "...");
         holder.start_price.setText("Start price: " + holder.auction.getStartPrice());
-        holder.end_date.setText("End: " + DateHelper.calculateRemainingTime(DateHelper.stringToDate(holder.auction.getEndDate())));
+        holder.end_date.setText("End: " + DateHelper.calculateRemainingTime(holder.auction.getEndDate()));
     }
 
     @Override
@@ -78,8 +78,8 @@ public class AuctionsAdapter extends RecyclerView.Adapter<AuctionsAdapter.ViewHo
                     Intent intent = new Intent(context, AuctionActivity.class);
                     intent.putExtra("auction_id", auction.getId());
                     intent.putExtra("auction_start_price", auction.getStartPrice());
-                    intent.putExtra("auction_start_date", auction.getStartDate());
-                    intent.putExtra("auction_end_date", auction.getEndDate());
+                    intent.putExtra("auction_start_date", auction.getStartDate().getTime());
+                    intent.putExtra("auction_end_date", auction.getEndDate().getTime());
                     intent.putExtra("item_id", auction.getItem().getId());
                     intent.putExtra("item_name", auction.getItem().getName());
                     intent.putExtra("item_description", auction.getItem().getDescription());

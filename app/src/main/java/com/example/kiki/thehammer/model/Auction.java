@@ -11,8 +11,8 @@ public class Auction {
 
     private String id;
     private double startPrice;
-    private String startDate;
-    private String endDate;
+    private Date startDate;
+    private Date endDate;
     private User user;
     private Item item;
     private List<Bid> bids;
@@ -21,7 +21,7 @@ public class Auction {
 
     public Auction(String id){this.id = id;}
 
-    public Auction(String id, double startPrice, String startDate, String endDate, User user, Item item) {
+    public Auction(String id, double startPrice, Date startDate, Date endDate, User user, Item item) {
         this.id = id;
         this.startPrice = startPrice;
         this.startDate = startDate;
@@ -30,7 +30,7 @@ public class Auction {
         this.item = item;
     }
 
-    public Auction(String id, double startPrice, String startDate, String endDate, Item item){
+    public Auction(String id, double startPrice, Date startDate, Date endDate, Item item){
         this.id = id;
         this.startPrice = startPrice;
         this.startDate = startDate;
@@ -54,19 +54,19 @@ public class Auction {
         this.startPrice = startPrice;
     }
 
-    public String getStartDate() {
+    public Date getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(String startDate) {
+    public void setStartDate(Date startDate) {
         this.startDate = startDate;
     }
 
-    public String getEndDate() {
+    public Date getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(String endDate) {
+    public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
 

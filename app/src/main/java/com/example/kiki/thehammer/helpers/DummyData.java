@@ -1,6 +1,18 @@
 package com.example.kiki.thehammer.helpers;
 
+import com.example.kiki.thehammer.model.Auction;
+import com.example.kiki.thehammer.model.Bid;
+import com.example.kiki.thehammer.model.Item;
+import com.example.kiki.thehammer.model.User;
+import com.example.kiki.thehammer.services.AuctionService;
+import com.example.kiki.thehammer.services.BidService;
+import com.example.kiki.thehammer.services.ItemService;
+import com.example.kiki.thehammer.services.UserService;
+
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Lazar on 22/1/2018.
@@ -105,6 +117,7 @@ public class DummyData {
     public static String user_img_8 = "https://firebasestorage.googleapis.com/v0/b/thehammer-c625b.appspot.com/o/users%2F08.jpg?alt=media&token=99422624-b435-415c-a71e-47abd26272b3";
     public static String user_img_9 = "https://firebasestorage.googleapis.com/v0/b/thehammer-c625b.appspot.com/o/users%2F09.jpg?alt=media&token=21277c29-f2a9-4879-bc57-436886f51ed6";
     public static String user_img_10 = "https://firebasestorage.googleapis.com/v0/b/thehammer-c625b.appspot.com/o/users%2F10.jpg?alt=media&token=2f8b1cb1-0f4e-4ea2-9a00-b5af03359145";
+    public static String user_img_11 = "https://firebasestorage.googleapis.com/v0/b/thehammer-c625b.appspot.com/o/users%2F11.jpg?alt=media&token=75afd9e3-45c4-4f40-a8a4-d2ea7eaa3df8";
 
     public static String[] user_images = new String[]{user_img_1, user_img_2, user_img_3, user_img_4, user_img_5, user_img_6, user_img_7, user_img_8, user_img_9, user_img_10};
 
@@ -113,16 +126,39 @@ public class DummyData {
     public static String default_password = "password";
     public static String default_address = "St. John's Boulevard ";
 
-    public static String user_id = "-L3dImq0ynmbXSfGsFWk";
+    public static String user_id = "-L3jag-2VR_AquObvpCL";
 
     // Auction dummy data
 
     public static double auction_default_start_price = 1000;
-    public static String default_auction_start_date_str = "21/01/2018 00:00";
-    public static String default_auction_end_date_str = "21/03/2018 00:00";
 
     // Bid dummy data
 
     public static double bid_default_price = 1100;
-    public static String bid_default_date = "23/01/2018 00:00";
+
+    public static Date getDummyDate(int month, int weekOfMonth, int dayOfWeek){
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.MONTH, month);
+        calendar.set(Calendar.WEEK_OF_MONTH, weekOfMonth);
+        calendar.set(Calendar.DAY_OF_WEEK, dayOfWeek);
+        return calendar.getTime();
+    }
+
+    public static void initDummyData(){
+        ItemService itemService = new ItemService();
+        UserService userService = new UserService();
+        AuctionService auctionService = new AuctionService();
+        BidService bidService = new BidService();
+
+        List<Item> items = new ArrayList<>();
+        List<User> users = new ArrayList<>();
+        List<Auction> auctions = new ArrayList<>();
+        List<Bid> bids = new ArrayList<>();
+
+        itemService.addItems(items);
+        userService.addUsers(users);
+        auctionService.addAuctions(auctions, users, items);
+        bidService.addBids(bids, auctions, users);
+    }
+
 }

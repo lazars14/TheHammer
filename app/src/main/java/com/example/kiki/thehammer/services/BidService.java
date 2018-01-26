@@ -28,7 +28,7 @@ public class BidService {
 
         for(int i = 0; i < 10; i++){
             String id = dbReference.push().getKey();
-            Bid bid = new Bid(id, DummyData.bid_default_price + i, DummyData.bid_default_date, new Auction(auctions.get(auctions.size() - (i + 1)).getId()),
+            Bid bid = new Bid(id, DummyData.bid_default_price + i, DummyData.getDummyDate(1, 2, 1), new Auction(auctions.get(auctions.size() - (i + 1)).getId()),
                     new User(users.get(auctions.size() - (i + 1)).getId()));
 
             dbReference.child(id).setValue(bid);
@@ -37,7 +37,7 @@ public class BidService {
         }
     }
 
-    public void addBid(double price, String date, Auction auction, User user){
+    public void addBid(double price, Date date, Auction auction, User user){
         String id = dbReference.push().getKey();
         Bid newBid = new Bid(id, price, date, auction, user);
 

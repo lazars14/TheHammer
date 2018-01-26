@@ -10,13 +10,13 @@ public class Bid {
 
     private String id;
     private double price;
-    private String dateTime;
+    private Date dateTime;
     private Auction auction;
     private User user;
 
     public Bid(){}
 
-    public Bid(String id, double price, String dateTime, Auction auction, User user) {
+    public Bid(String id, double price, Date dateTime, Auction auction, User user) {
         this.id = id;
         this.price = price;
         this.dateTime = dateTime;
@@ -24,7 +24,7 @@ public class Bid {
         this.user = user;
     }
 
-    public Bid(String id, double price, String dateTime, User user){
+    public Bid(String id, double price, Date dateTime, User user){
         this.id = id;
         this.price = price;
         this.dateTime = dateTime;
@@ -47,11 +47,11 @@ public class Bid {
         this.price = price;
     }
 
-    public String getDateTime() {
+    public Date getDateTime() {
         return dateTime;
     }
 
-    public void setDateTime(String dateTime) {
+    public void setDateTime(Date dateTime) {
         this.dateTime = dateTime;
     }
 

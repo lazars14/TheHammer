@@ -1,7 +1,9 @@
 package com.example.kiki.thehammer.helpers;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
@@ -11,23 +13,11 @@ import java.util.concurrent.TimeUnit;
 
 public class DateHelper {
 
-    public static final SimpleDateFormat format = new SimpleDateFormat("DD/MM/yyyy hh:mm");
     private static final String[] timeNames = new String[]{"days", "hours", "minutes"};
     private static final String whitespace = " ";
 
-    public static Date stringToDate(String date_str){
-        Date date = null;
-        try {
-            date = format.parse(date_str);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        return date;
-    }
-
     public static String dateToString(Date date){
-        return format.format(date);
+        return DateFormat.getDateTimeInstance().format(date);
     }
 
     public static boolean auctionEnded(Date endDate){
@@ -46,6 +36,11 @@ public class DateHelper {
         long diffInMillisec = endDate.getTime() - now.getTime();
 
         long diffInDays = TimeUnit.MILLISECONDS.toDays(diffInMillisec);
+
+        if(diffInDays < 0){
+            return "Auction Over";
+        }
+
         long hoursMilis = diffInMillisec - TimeUnit.DAYS.toMillis(diffInDays);
         long diffInHours = TimeUnit.MILLISECONDS.toHours(hoursMilis);
         long minsMilis = hoursMilis - TimeUnit.HOURS.toMillis(diffInHours);
@@ -59,4 +54,5 @@ public class DateHelper {
 
         return sb.toString();
     }
+
 }

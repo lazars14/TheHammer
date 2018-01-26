@@ -1,5 +1,7 @@
 package com.example.kiki.thehammer.services;
 
+import android.text.format.DateUtils;
+
 import com.example.kiki.thehammer.helpers.DateHelper;
 import com.example.kiki.thehammer.helpers.DummyData;
 import com.example.kiki.thehammer.model.Auction;
@@ -12,6 +14,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -32,8 +35,8 @@ public class AuctionService {
     public void addAuctions(List<Auction> auctions, List<User> users, List<Item> items) {
         for(int i = 0; i < 10; i++){
             String id = dbReference.push().getKey();
-            Auction auction = new Auction(id, DummyData.auction_default_start_price, DummyData.default_auction_start_date_str,
-                    DummyData.default_auction_end_date_str, new User(users.get(i).getId()), new Item(items.get(i).getId()));
+            Auction auction = new Auction(id, DummyData.auction_default_start_price, DummyData.getDummyDate(1, 1, 1),
+                    DummyData.getDummyDate(2, 4, 1), new User(users.get(i).getId()), new Item(items.get(i).getId()));
 
             dbReference.child(id).setValue(auction);
 

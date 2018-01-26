@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.kiki.thehammer.R;
 import com.example.kiki.thehammer.data.TheHammerContract;
@@ -28,7 +29,7 @@ import java.util.Date;
 public class ItemAuctionFragment extends Fragment {
 
     private View auction_info_view;
-    private int item_id;
+    private String item_id;
 
     public ItemAuctionFragment() {
         // Required empty public constructor
@@ -51,7 +52,7 @@ public class ItemAuctionFragment extends Fragment {
             ImageHelper.loadImage(item_image, getContext(), imageView, 0);
             auction_info_view = v.findViewById(R.id.auction_info);
 
-            item_id = bundle.getInt("id");
+            item_id = bundle.getString("id");
             load_auction_info();
         }
 
@@ -70,7 +71,9 @@ public class ItemAuctionFragment extends Fragment {
                         for(DataSnapshot auctionSnapshot : dataSnapshot.getChildren()){
                             Auction auction = auctionSnapshot.getValue(Auction.class);
 
-                            if(auction.getItem().getId().equals(item_id) && DateHelper.stringToDate(auction.getEndDate()).after(now)){
+//                            Toast.makeText(getContext(), auction.getItem().getId() + " iz aukcije, " + item_id + " iz item-a", Toast.LENGTH_SHORT).show();
+
+                            if(auction.getItem().getId().equals(item_id) && auction.getEndDate().after(now)){
                                 setAuctionInfo(auction);
                             }
                         }
@@ -91,7 +94,7 @@ public class ItemAuctionFragment extends Fragment {
 
     private void setAuctionInfo(Auction auction){
         ValuePairViewHelper.setLabelValuePair(auction_info_view, R.id.start_price, "Start Price:", String.valueOf(auction.getStartPrice()));
-        ValuePairViewHelper.setLabelValuePair(auction_info_view, R.id.start_date, "Start Date:", auction.getStartDate());
-        ValuePairViewHelper.setLabelValuePair(auction_info_view, R.id.end_date, "End Date:", auction.getEndDate());
+        ValuePairViewHelper.setLabelValuePair(auction_info_view, R.id.start_date, "Start Date:", DateHelper.dateToString(auction.getStartDate()));
+        ValuePairViewHelper.setLabelValuePair(auction_info_view, R.id.end_date, "End Date:", DateHelper.dateToString(auction.getEndDate()));
     }
 }

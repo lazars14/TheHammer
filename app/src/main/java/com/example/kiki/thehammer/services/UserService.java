@@ -34,7 +34,7 @@ public class UserService {
         }
 
         String id = dbReference.push().getKey();
-        User u = new User(id, DummyData.user_firstnames[10] + " " + DummyData.user_lastnames[10], DummyData.user_firstnames[10] + DummyData.user_lastnames[10] + DummyData.email_end, DummyData.default_password, DummyData.user_images[0], DummyData.default_address + " 123", DummyData.default_phone_num + "7");
+        User u = new User(id, DummyData.user_firstnames[10] + " " + DummyData.user_lastnames[10], DummyData.user_firstnames[10] + DummyData.user_lastnames[10] + DummyData.email_end, DummyData.default_password, DummyData.user_images[10], DummyData.default_address + " 123", DummyData.default_phone_num + "7");
 
         dbReference.child(id).setValue(u);
         users.add(u);

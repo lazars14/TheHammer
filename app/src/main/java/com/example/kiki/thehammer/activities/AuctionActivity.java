@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.kiki.thehammer.R;
 import com.example.kiki.thehammer.data.TheHammerContract;
@@ -38,8 +39,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class AuctionActivity extends AppCompatActivity
@@ -51,6 +50,7 @@ public class AuctionActivity extends AppCompatActivity
     private double max_price;
     private String auction_id;
     private String item_id;
+    private Date start_date;
     private Date end_date;
 
     private SharedPreferences preferences;
@@ -108,19 +108,20 @@ public class AuctionActivity extends AppCompatActivity
             description.setText(bundle.getString("item_description"));
             ImageHelper.loadImage(bundle.getString("item_image"), getApplicationContext(), imageView, 0);
 
-            auction_info_view = findViewById(R.id.auction_info);
-            ValuePairViewHelper.setLabelValuePair(auction_info_view, R.id.start_price, "Start Price:", String.valueOf(bundle.getDouble("auction_start_price")));
-            ValuePairViewHelper.setLabelValuePair(auction_info_view, R.id.start_date, "Start Date:", bundle.getString("auction_start_date"));
-            ValuePairViewHelper.setLabelValuePair(auction_info_view, R.id.end_date, "End Date:", bundle.getString("auction_end_date"));
-
-            end_date = DateHelper.stringToDate(bundle.getString("auction_end_date"));
+            start_date = new Date(bundle.getLong("auction_start_date"));
+            end_date =  new Date(bundle.getLong("auction_end_date"));
             start_price = bundle.getDouble("auction_start_price");
             max_price = start_price;
+
+            auction_info_view = findViewById(R.id.auction_info);
+            ValuePairViewHelper.setLabelValuePair(auction_info_view, R.id.start_price, "Start Price:", String.valueOf(bundle.getDouble("auction_start_price")));
+            ValuePairViewHelper.setLabelValuePair(auction_info_view, R.id.start_date, "Start Date:", DateHelper.dateToString(start_date));
+            ValuePairViewHelper.setLabelValuePair(auction_info_view, R.id.end_date, "End Date:", DateHelper.dateToString(end_date));
 
             boolean auctionEnded = DateHelper.auctionEnded(end_date);
             if(auctionEnded){
                 // auction over, if user won it display owner info
-//                load_auction_winner(auction_id, item_id);
+                load_auction_winner(auction_id, item_id);
             } else {
                 // auction still in progress, display current price
                 load_current_price();
@@ -188,7 +189,7 @@ public class AuctionActivity extends AppCompatActivity
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         for(DataSnapshot bidSnapshot : dataSnapshot.getChildren()){
                             Bid bid = bidSnapshot.getValue(Bid.class);
-                            if(bid.getAuction().getId().equals(auction_id) && end_date.after(DateHelper.stringToDate(bid.getDateTime())) && bid.getPrice() > start_price){
+                            if(bid.getAuction().getId().equals(auction_id) && end_date.after(bid.getDateTime()) && bid.getPrice() > start_price){
                                 max_price = bid.getPrice();
                             }
                         }

@@ -1,7 +1,5 @@
 package com.example.kiki.thehammer.activities;
 
-import android.content.ContentResolver;
-import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -19,27 +17,18 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.example.kiki.thehammer.R;
 import com.example.kiki.thehammer.adapters.ItemsAdapter;
-import com.example.kiki.thehammer.data.TheHammerContract;
-import com.example.kiki.thehammer.helpers.DataInitHelper;
-import com.example.kiki.thehammer.helpers.DateHelper;
 import com.example.kiki.thehammer.helpers.DummyData;
 import com.example.kiki.thehammer.helpers.FilterHelper;
 import com.example.kiki.thehammer.helpers.NavigationHelper;
-import com.example.kiki.thehammer.model.Auction;
-import com.example.kiki.thehammer.model.Bid;
 import com.example.kiki.thehammer.model.Item;
-import com.example.kiki.thehammer.model.User;
-import com.example.kiki.thehammer.services.AuctionService;
-import com.example.kiki.thehammer.services.BidService;
 import com.example.kiki.thehammer.services.ItemService;
-import com.example.kiki.thehammer.services.UserService;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
@@ -108,6 +97,7 @@ public class ItemsActivity extends AppCompatActivity implements NavigationView.O
 
         setRecyclerView();
         load_items_from_firebase();
+
 //        DataInitHelper.initDummyData();
     }
 

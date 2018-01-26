@@ -9,8 +9,8 @@
     tools:context="com.example.kiki.thehammer.activities.AuctionActivity"
     tools:showIn="@layout/app_bar_auction">
 
-    <include layout="@layout/auction_item_info" android:id="@+id/item_info"/>
+        <include layout="@layout/auction_item_info" android:id="@+id/item_info"/>
 
-    <include layout="@layout/item_details_auction_info" android:id="@+id/auction_info"/>
+        <include layout="@layout/item_details_auction_info" android:id="@+id/auction_info"/>
 
 </LinearLayout>
