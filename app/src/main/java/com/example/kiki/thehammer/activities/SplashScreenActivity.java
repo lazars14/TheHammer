@@ -14,12 +14,46 @@ public class SplashScreenActivity extends AppCompatActivity {
 
     private int visibilityTime;
     private boolean visible;
+    private SharedPreferences preferences;
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        setVisibilityTime();
+
+        Thread thread = new Thread(){
+            @Override
+            public void run() {
+                setSplashScreenVisibility(visibilityTime);
+                Intent intent = new Intent(getApplicationContext(), ItemsActivity.class);
+                startActivity(intent);
+            }
+        };
+
+        thread.start();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+//        setVisibilityTime();
+//
+//        thread.start();
+    }
+
+    public void setSplashScreenVisibility(int visibleInvisible)
+    {
+        try {
+            sleep(visibleInvisible);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setVisibilityTime(){
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         visibilityTime = Integer.parseInt(preferences.getString("splash_screen_visibility", "2000"));
         if(visibilityTime < 1000){
@@ -31,25 +65,6 @@ public class SplashScreenActivity extends AppCompatActivity {
             setContentView(R.layout.activity_splash_screen);
         } else {
             visibilityTime = 0;
-        }
-
-        Thread thread = new Thread(){
-            @Override
-            public void run() {
-                setSplashScreenVisibility(visibilityTime);
-                Intent intent = new Intent(getApplicationContext(), ItemsActivity.class);
-                startActivity(intent);
-            }
-        };
-        thread.start();
-    }
-
-    public void setSplashScreenVisibility(int visibleInvisible)
-    {
-        try {
-            sleep(visibleInvisible);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         }
     }
 

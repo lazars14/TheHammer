@@ -63,7 +63,7 @@ public class AuctionActivity extends AppCompatActivity
     private final Runnable action = new Runnable() {
         @Override
         public void run() {
-            navHelper.initUserInfo();
+            navHelper.checkIfPrefChanged();
         }
     };
 
@@ -158,7 +158,7 @@ public class AuctionActivity extends AppCompatActivity
 
                                 @Override
                                 public void onCancelled(DatabaseError databaseError) {
-
+                                    Toast.makeText(getApplicationContext(), DummyData.FAILED_TO_LOAD_DATA, Toast.LENGTH_SHORT).show();
                                 }
                             });
                         }
@@ -166,7 +166,7 @@ public class AuctionActivity extends AppCompatActivity
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-
+                        Toast.makeText(getApplicationContext(), DummyData.FAILED_TO_LOAD_DATA, Toast.LENGTH_SHORT).show();
                     }
                 });
 
@@ -199,7 +199,7 @@ public class AuctionActivity extends AppCompatActivity
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-
+                        Toast.makeText(getApplicationContext(), DummyData.FAILED_TO_LOAD_DATA, Toast.LENGTH_SHORT).show();
                     }
                 });
 

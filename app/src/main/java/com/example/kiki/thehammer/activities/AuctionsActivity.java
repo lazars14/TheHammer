@@ -23,6 +23,7 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.example.kiki.thehammer.R;
 import com.example.kiki.thehammer.adapters.AuctionsAdapter;
@@ -77,7 +78,7 @@ public class AuctionsActivity extends AppCompatActivity
         @Override
         public void run() {
             // refresh data
-            navHelper.initUserInfo();
+            navHelper.checkIfPrefChanged();
             setRecyclerView();
         }
     };
@@ -164,7 +165,7 @@ public class AuctionsActivity extends AppCompatActivity
 
                                                 @Override
                                                 public void onCancelled(DatabaseError databaseError) {
-
+                                                    Toast.makeText(getApplicationContext(), DummyData.FAILED_TO_LOAD_DATA, Toast.LENGTH_SHORT).show();
                                                 }
                                             });
                                         }
@@ -172,7 +173,7 @@ public class AuctionsActivity extends AppCompatActivity
 
                                     @Override
                                     public void onCancelled(DatabaseError databaseError) {
-
+                                        Toast.makeText(getApplicationContext(), DummyData.FAILED_TO_LOAD_DATA, Toast.LENGTH_SHORT).show();
                                     }
                                 });
                             }
@@ -182,7 +183,7 @@ public class AuctionsActivity extends AppCompatActivity
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-
+                        Toast.makeText(getApplicationContext(), DummyData.FAILED_TO_LOAD_DATA, Toast.LENGTH_SHORT).show();
                     }
                 });
 

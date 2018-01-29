@@ -2,20 +2,28 @@ package com.example.kiki.thehammer.activities;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.preference.PreferenceScreen;
 import android.support.v7.app.ActionBar;
+import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
 
 import com.example.kiki.thehammer.R;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
 public class SettingsActivity extends AppCompatPreferenceActivity {
+
+    private static SharedPreferences preferences;
 
     /**
      * A preference value change listener that updates the preference's summary
@@ -28,9 +36,23 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
             if(!preference.getKey().equals("password")) preference.setSummary(stringValue);
 
+            if(!preference.getKey().equals("splash_screen_visibility") && !preference.getKey().equals("splash_screen_show")){
+                setPreferenceChangedPref();
+            }
+
             return true;
         }
     };
+
+    private static void setSharedPreferences(Context context){
+        preferences = PreferenceManager.getDefaultSharedPreferences(context);
+    }
+
+    private static void setPreferenceChangedPref(){
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("something_changed", true);
+        editor.commit();
+    }
 
     /**
      * Helper method to determine if the device has an extra-large screen. For
@@ -66,6 +88,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupActionBar();
+
+        setSharedPreferences(getApplicationContext());
     }
 
     @Override
@@ -117,7 +141,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
      * activity is showing a two-pane settings UI.
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static class UserInfoPreferenceFragment extends PreferenceFragment {
+    public static class UserInfoPreferenceFragment extends PreferenceFragment implements View.OnClickListener {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
@@ -142,6 +166,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         }
 
 
+        @Override
+        public void onClick(View view) {
+
+        }
     }
 
     /**
@@ -155,6 +183,13 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_splash_screen);
             setHasOptionsMenu(true);
+
+//            PreferenceScreen preferenceScreen = getPreferenceScreen();
+//            Preference preference = preferenceScreen.findPreference("image");
+//            View v = preference.getView(null, null);
+//            ImageView iv = v.findViewById(R.id.image);
+//            iv.setImageResource(R.drawable.default_auction_item);
+//            Picasso.with(getActivity()).load(R.drawable.default_auction_item).into(iv);
 
             // Bind the summaries of EditText/List/Dialog/Ringtone preferences
             // to their values. When their values change, their summaries are

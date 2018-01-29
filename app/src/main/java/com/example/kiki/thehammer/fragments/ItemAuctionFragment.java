@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.example.kiki.thehammer.R;
 import com.example.kiki.thehammer.data.TheHammerContract;
 import com.example.kiki.thehammer.helpers.DateHelper;
+import com.example.kiki.thehammer.helpers.DummyData;
 import com.example.kiki.thehammer.helpers.ImageHelper;
 import com.example.kiki.thehammer.helpers.ValuePairViewHelper;
 import com.example.kiki.thehammer.model.Auction;
@@ -81,7 +82,7 @@ public class ItemAuctionFragment extends Fragment {
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-
+                        Toast.makeText(getContext(), DummyData.FAILED_TO_LOAD_DATA, Toast.LENGTH_SHORT).show();
                     }
                 });
 

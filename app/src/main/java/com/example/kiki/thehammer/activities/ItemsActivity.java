@@ -1,8 +1,10 @@
 package com.example.kiki.thehammer.activities;
 
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -26,12 +28,16 @@ import com.example.kiki.thehammer.helpers.FilterHelper;
 import com.example.kiki.thehammer.helpers.NavigationHelper;
 import com.example.kiki.thehammer.model.Item;
 import com.example.kiki.thehammer.services.ItemService;
+import com.example.kiki.thehammer.services.NotificationService;
+import com.example.kiki.thehammer.services.UserService;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
 
+import java.lang.ref.PhantomReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,6 +47,7 @@ public class ItemsActivity extends AppCompatActivity implements NavigationView.O
     private GridLayoutManager gridLayoutManager;
     private ItemsAdapter adapter;
     private List<Item> items = new ArrayList<>();
+    private UserService userService;
 
     private NavigationHelper navHelper;
     private DrawerLayout drawer;
@@ -53,7 +60,7 @@ public class ItemsActivity extends AppCompatActivity implements NavigationView.O
         @Override
         public void run() {
             // refresh data
-            navHelper.initUserInfo();
+            navHelper.checkIfPrefChanged();
             setRecyclerView();
         }
     };
@@ -98,7 +105,18 @@ public class ItemsActivity extends AppCompatActivity implements NavigationView.O
         setRecyclerView();
         load_items_from_firebase();
 
-//        DataInitHelper.initDummyData();
+        checkIfRegistered();
+    }
+
+    private void checkIfRegistered(){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        if(preferences.getString("notification_token", DummyData.NOT_REGISTERED).equals(DummyData.NOT_REGISTERED)){
+            userService = new UserService();
+            String id = userService.addUser();
+
+            NotificationService notificationService = new NotificationService(getApplicationContext(), preferences);
+            notificationService.registerUser(id);
+        }
     }
 
     private void load_items_from_firebase() {
@@ -124,7 +142,7 @@ public class ItemsActivity extends AppCompatActivity implements NavigationView.O
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-
+                        Toast.makeText(getApplicationContext(), DummyData.FAILED_TO_LOAD_DATA, Toast.LENGTH_SHORT).show();
                     }
                 });
 

@@ -20,6 +20,12 @@ import java.util.List;
 
 public class DummyData {
 
+    public static final String WEB_API_KEY = "AIzaSyASjLRuHEN425SmimnYQSmZALhYpYaYDJg";
+
+    public static final String NOT_REGISTERED = "NOT REGISTERED";
+
+    public static final String FAILED_TO_LOAD_DATA = "Failed to load data";
+
     // Item dummy data
 
     public static String[] itemNames = new String[]{"You Said What, 2009", "No, 2005", "A Half (Coarse), 2008", "Thinks I, To Myself, 2017", "Philodendron 1, 1983–1985",
@@ -119,7 +125,7 @@ public class DummyData {
     public static String user_img_10 = "https://firebasestorage.googleapis.com/v0/b/thehammer-c625b.appspot.com/o/users%2F10.jpg?alt=media&token=2f8b1cb1-0f4e-4ea2-9a00-b5af03359145";
     public static String user_img_11 = "https://firebasestorage.googleapis.com/v0/b/thehammer-c625b.appspot.com/o/users%2F11.jpg?alt=media&token=75afd9e3-45c4-4f40-a8a4-d2ea7eaa3df8";
 
-    public static String[] user_images = new String[]{user_img_1, user_img_2, user_img_3, user_img_4, user_img_5, user_img_6, user_img_7, user_img_8, user_img_9, user_img_10};
+    public static String[] user_images = new String[]{user_img_1, user_img_2, user_img_3, user_img_4, user_img_5, user_img_6, user_img_7, user_img_8, user_img_9, user_img_10, user_img_11};
 
     public static String default_phone_num = "060/000-00";
     public static String email_end = "@gmail.com";

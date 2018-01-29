@@ -3,9 +3,11 @@ package com.example.kiki.thehammer.fragments;
 import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
@@ -75,10 +77,6 @@ public class ItemBidsFragment extends Fragment implements View.OnClickListener{
 
         recyclerView = v.findViewById(R.id.recycler_view);
 
-//        gridLayoutManager = new GridLayoutManager(getContext(),1);
-//        gridLayoutManager.setReverseLayout(true);
-//        recyclerView.setLayoutManager(gridLayoutManager);
-
         adapter = new BidsAdapter(getContext(), bids);
         recyclerView.setAdapter(adapter);
 
@@ -141,7 +139,7 @@ public class ItemBidsFragment extends Fragment implements View.OnClickListener{
 
                                                     @Override
                                                     public void onCancelled(DatabaseError databaseError) {
-
+                                                        Toast.makeText(getContext(), DummyData.FAILED_TO_LOAD_DATA, Toast.LENGTH_SHORT).show();
                                                     }
                                                 });
 
@@ -150,12 +148,11 @@ public class ItemBidsFragment extends Fragment implements View.OnClickListener{
 
                                         }
 
-//                                        mLayoutManager.scrollToPosition(bids.size() - 1);
                                     }
 
                                     @Override
                                     public void onCancelled(DatabaseError databaseError) {
-
+                                        Toast.makeText(getContext(), DummyData.FAILED_TO_LOAD_DATA, Toast.LENGTH_SHORT).show();
                                     }
                                 });
                             }
@@ -164,7 +161,7 @@ public class ItemBidsFragment extends Fragment implements View.OnClickListener{
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-
+                        Toast.makeText(getContext(), DummyData.FAILED_TO_LOAD_DATA, Toast.LENGTH_SHORT).show();
                     }
                 });
 
@@ -225,7 +222,8 @@ public class ItemBidsFragment extends Fragment implements View.OnClickListener{
 
                             if(euro_cents > bids.get(bids.size() - 1).getPrice()){
                                 BidService bidService = new BidService();
-                                bidService.addBid(euro_cents, new Date(), new Auction(auction_id), new User(DummyData.user_id));
+                                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+                                bidService.addBid(euro_cents, new Date(), new Auction(auction_id), new User(preferences.getString("user_id", DummyData.user_id)));
 
                                 Toast.makeText(getContext(), "Bid successfull", Toast.LENGTH_SHORT).show();
                             } else {

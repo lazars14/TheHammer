@@ -128,4 +128,5 @@
     <string name="auction_info_title">Auction Info</string>
     <string name="point_symbol">.</string>
     <string name="euro_symbol">€</string>
+    <string name="pref_header_user_image">User image</string>
 </resources>

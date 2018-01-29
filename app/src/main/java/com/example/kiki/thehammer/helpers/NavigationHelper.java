@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.kiki.thehammer.R;
+import com.example.kiki.thehammer.services.UserService;
 
 /**
  * Created by Kiki on 27-Dec-17.
@@ -31,7 +32,7 @@ public class NavigationHelper {
         this.appContext = applicationContext;
         this.navigationView = navigationView;
         getViewsForUserInfo();
-        initUserInfo();
+        initUserInfo(PreferenceManager.getDefaultSharedPreferences(appContext));
     }
 
     private void getViewsForUserInfo(){
@@ -42,9 +43,7 @@ public class NavigationHelper {
         address = headerView.findViewById(R.id.address);
     }
 
-    public void initUserInfo(){
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(appContext);
-
+    public void initUserInfo(SharedPreferences preferences){
         String firstAndLastnameText = preferences.getString("firstname", "John") + " " + preferences.getString("lastname", "Doe");
 
         String url = preferences.getString("image", not_changed);
@@ -61,5 +60,15 @@ public class NavigationHelper {
     public void navigateTo(Class activity, AppCompatActivity currentActivity){
         Intent intent = new Intent(appContext, activity);
         currentActivity.startActivity(intent);
+    }
+
+    public void checkIfPrefChanged(){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(appContext);
+        boolean somethingChanged = preferences.getBoolean("something_changed", false);
+        if(somethingChanged) {
+            UserService userService = new UserService();
+            userService.updateUser(appContext);
+            initUserInfo(preferences);
+        }
     }
 }

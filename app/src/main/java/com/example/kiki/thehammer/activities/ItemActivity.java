@@ -34,7 +34,7 @@ public class ItemActivity extends AppCompatActivity
     private final Runnable action = new Runnable() {
         @Override
         public void run() {
-            navHelper.initUserInfo();
+            navHelper.checkIfPrefChanged();
         }
     };
 
