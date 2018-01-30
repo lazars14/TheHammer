@@ -9,7 +9,23 @@
     tools:context="com.example.kiki.thehammer.activities.AuctionActivity"
     tools:showIn="@layout/app_bar_auction">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:text="@string/item_info_title"
+            android:textColor="@color/splash_screen_text"
+            android:textSize="10pt"/>
+
         <include layout="@layout/auction_item_info" android:id="@+id/item_info"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:text="@string/auction_info_title"
+            android:textColor="@color/splash_screen_text"
+            android:textSize="10pt"/>
 
         <include layout="@layout/item_details_auction_info" android:id="@+id/auction_info"/>
 

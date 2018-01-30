@@ -14,12 +14,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -43,8 +46,10 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.Thread.sleep;
+
 public class AuctionsActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
+        implements NavigationView.OnNavigationItemSelectedListener {
 
     private RecyclerView recyclerView;
     private GridLayoutManager gridLayoutManager;
@@ -70,7 +75,6 @@ public class AuctionsActivity extends AppCompatActivity
     private final Runnable action = new Runnable() {
         @Override
         public void run() {
-            // refresh data
             navHelper.checkIfPrefChanged();
             setRecyclerView();
         }
@@ -145,26 +149,26 @@ public class AuctionsActivity extends AppCompatActivity
                                             final Auction auction = dataSnapshot.getValue(Auction.class);
 
                                             if(auction != null){
-                                                if(!auctions.contains(auction)){
+                                                Query itemQuery = itemService.getReferenceForItemById(auction.getItem().getId());
 
-                                                    Query itemQuery = itemService.getReferenceForItemById(auction.getItem().getId());
+                                                itemQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                                        Item item = dataSnapshot.getValue(Item.class);
+                                                        auction.setItem(item);
 
-                                                    itemQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-                                                        @Override
-                                                        public void onDataChange(DataSnapshot dataSnapshot) {
-                                                            Item item = dataSnapshot.getValue(Item.class);
-                                                            auction.setItem(item);
-
+                                                        if(!auctionsContainAuction(auction.getId())){
                                                             auctions.add(auction);
                                                             adapter.notifyDataSetChanged();
                                                         }
 
-                                                        @Override
-                                                        public void onCancelled(DatabaseError databaseError) {
-                                                            Toast.makeText(getApplicationContext(), DummyData.FAILED_TO_LOAD_DATA, Toast.LENGTH_SHORT).show();
-                                                        }
-                                                    });
-                                                }
+                                                    }
+
+                                                    @Override
+                                                    public void onCancelled(DatabaseError databaseError) {
+                                                        Toast.makeText(getApplicationContext(), DummyData.FAILED_TO_LOAD_DATA, Toast.LENGTH_SHORT).show();
+                                                    }
+                                                });
                                             } else Toast.makeText(getApplicationContext(), DummyData.FAILED_TO_LOAD_DATA, Toast.LENGTH_SHORT).show();
                                         }
 
@@ -194,6 +198,16 @@ public class AuctionsActivity extends AppCompatActivity
         task.execute();
     }
 
+    private boolean auctionsContainAuction(String auctionId){
+        for(Auction auction : auctions){
+            if(auction.getId().equals(auctionId)){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public void setSpinnerData(){
         View filter_view = findViewById(R.id.auctions_filter);
         spinner = filter_view.findViewById(R.id.spinner);
@@ -214,6 +228,8 @@ public class AuctionsActivity extends AppCompatActivity
                 String selectedItem = spinner.getSelectedItem().toString();
                 if(selectedItem.equals("status")){
                     filter_status.setEnabled(true);
+                    filter_text.setText("");
+                    filter_status.setChecked(false);
                 }else {
                     filter_status.setEnabled(false);
                 }
@@ -225,8 +241,47 @@ public class AuctionsActivity extends AppCompatActivity
             }
         });
 
-        filter_text = filter_view.findViewById(R.id.filter_text);
         filter_status = filter_view.findViewById(R.id.auction_status);
+        filter_status.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                try {
+                    sleep(500);
+                    filterHelper = new FilterHelper(spinner.getSelectedItem().toString(), filter_text.getEditableText().toString(), auctions, filter_status.isChecked(), recyclerView, getApplicationContext());
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        filter_text = filter_view.findViewById(R.id.filter_text);
+        filter_text.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                try {
+                    sleep(500);
+                    if(filter_text.getText().toString().equals("")){
+                        setRecyclerView();
+                    } else {
+                        filterHelper = new FilterHelper(spinner.getSelectedItem().toString(), filter_text.getEditableText().toString(), auctions, filter_status.isChecked(), recyclerView, getApplicationContext());
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
     }
 
     @Override
@@ -257,7 +312,7 @@ public class AuctionsActivity extends AppCompatActivity
         if (id == R.id.items) {
             navHelper.navigateTo(ItemsActivity.class, this);
         } else if (id == R.id.auctions) {
-            navHelper.navigateTo(AuctionsActivity.class, this);
+
         } else if (id == R.id.settings) {
             navHelper.navigateTo(SettingsActivity.class, this);
         }
@@ -266,28 +321,8 @@ public class AuctionsActivity extends AppCompatActivity
         return true;
     }
 
-    @Override
-    public void onClick(View view) {
-        if(filter_text.getText().toString().equals("")){
-            setRecyclerView();
-        } else {
-            filterHelper = new FilterHelper(spinner.getSelectedItem().toString(), filter_text.getEditableText().toString(), auctions, filter_status.isChecked(), recyclerView, this);
-        }
-    }
-
     public void setRecyclerView(){
         adapter = new AuctionsAdapter(this, auctions);
         recyclerView.setAdapter(adapter);
-
-//        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-//            @Override
-//            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-//
-//                if(gridLayoutManager.findLastCompletelyVisibleItemPosition() == auctions.size()-1){
-//                    load_data_from_content_provider(auctions.get(auctions.size() - 1).getId());
-//                }
-//
-//            }
-//        });
     }
 }

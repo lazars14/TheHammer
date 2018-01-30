@@ -14,6 +14,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -39,7 +41,9 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ItemsActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
+import static java.lang.Thread.sleep;
+
+public class ItemsActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private RecyclerView recyclerView;
     private GridLayoutManager gridLayoutManager;
@@ -57,7 +61,6 @@ public class ItemsActivity extends AppCompatActivity implements NavigationView.O
     private final Runnable action = new Runnable() {
         @Override
         public void run() {
-            // refresh data
             navHelper.checkIfPrefChanged();
             setRecyclerView();
         }
@@ -163,6 +166,31 @@ public class ItemsActivity extends AppCompatActivity implements NavigationView.O
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
         filter_text = filter_view.findViewById(R.id.filter_text);
+        filter_text.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                try {
+                    sleep(500);
+                    if(filter_text.getText().toString().equals("")){
+                        setRecyclerView();
+                    } else {
+                        filterHelper = new FilterHelper(spinner.getSelectedItem().toString(), filter_text.getEditableText().toString(), items, recyclerView, getApplicationContext());
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     @Override
@@ -191,7 +219,7 @@ public class ItemsActivity extends AppCompatActivity implements NavigationView.O
         int id = item.getItemId();
 
         if (id == R.id.items) {
-            navHelper.navigateTo(ItemsActivity.class, this);
+
         } else if (id == R.id.auctions) {
             navHelper.navigateTo(AuctionsActivity.class, this);
         } else if (id == R.id.settings) {
@@ -202,32 +230,9 @@ public class ItemsActivity extends AppCompatActivity implements NavigationView.O
         return true;
     }
 
-
-    @Override
-    public void onClick(View view) {
-        if(filter_text.getText().toString().equals("")){
-            setRecyclerView();
-        } else {
-            filterHelper = new FilterHelper(spinner.getSelectedItem().toString(), filter_text.getEditableText().toString(), items, recyclerView, this);
-        }
-
-    }
-
     public void setRecyclerView(){
         adapter = new ItemsAdapter(this, items);
         recyclerView.setAdapter(adapter);
-
-//        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-//            @Override
-//            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-//
-//                if(gridLayoutManager.findLastCompletelyVisibleItemPosition() == items.size()-1){
-//                    load_data_from_content_provider(items.get(items.size() - 1).getId());
-//                }
-//
-//            }
-//        });
     }
-
 
 }

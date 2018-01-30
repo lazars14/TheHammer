@@ -34,15 +34,6 @@ public class SplashScreenActivity extends AppCompatActivity {
         thread.start();
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-//        setVisibilityTime();
-//
-//        thread.start();
-    }
-
     public void setSplashScreenVisibility(int visibleInvisible)
     {
         try {

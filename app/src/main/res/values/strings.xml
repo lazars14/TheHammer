@@ -105,7 +105,7 @@
     <string name="app_name_upper">THE HAMMER</string>
     <string name="items">Items</string>
     <string name="auctions">Auctions</string>
-    <string name="filter_by">Filter by:</string>
+    <string name="filter_by">Filter:</string>
     <string name="add_bid">Add bid</string>
     <string name="item_details">Details</string>
     <string name="item_auction">Auction</string>

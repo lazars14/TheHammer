@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="150dp">
+    android:layout_height="170dp">
 
     <android.support.v7.widget.CardView
         android:id="@+id/card_view"
@@ -16,10 +16,18 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <ImageView
-                android:id="@+id/image"
+            <LinearLayout
                 android:layout_width="100dp"
-                android:layout_height="match_parent"/>
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:id="@+id/image"
+                    android:layout_width="fill_parent"
+                    android:layout_height="match_parent"
+                    android:adjustViewBounds="true"
+                    android:scaleType="centerCrop"/>
+
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -32,25 +40,29 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textStyle="bold"
-                    android:textColor="@color/splash_screen_text"/>
+                    android:textColor="@color/splash_screen_text"
+                    android:textSize="8pt"/>
 
                 <TextView
                     android:id="@+id/item_description"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:textSize="7pt"/>
 
                 <TextView
                     android:id="@+id/start_price"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingTop="5dp"/>
+                    android:paddingTop="5dp"
+                    android:textSize="7pt"/>
 
                 <TextView
                     android:id="@+id/end_date"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingTop="5dp"
-                    android:textColor="@color/auction_end_date"/>
+                    android:textColor="@color/auction_end_date"
+                    android:textSize="7pt"/>
 
             </LinearLayout>
 

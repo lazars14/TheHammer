@@ -15,6 +15,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.example.kiki.thehammer.R;
 import com.example.kiki.thehammer.fragments.ItemAuctionFragment;
@@ -50,11 +51,8 @@ public class ItemActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_item);
 
-        handler.post(action);
-
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        toolbar.setTitle(R.string.title_activity_item);
+        View toolbarView = findViewById(R.id.toolbar);
+        Toolbar toolbar = toolbarView.findViewById(R.id.toolbar);
 
         drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -83,6 +81,8 @@ public class ItemActivity extends AppCompatActivity
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             boolean bids = bundle.getBoolean("bids");
+
+            toolbar.setTitle(bundle.getString("name"));
 
             if(bids) mViewPager.setCurrentItem(1);
         }

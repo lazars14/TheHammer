@@ -9,7 +9,8 @@
         android:layout_height="wrap_content"
         android:textAlignment="textStart"
         android:gravity="start"
-        android:layout_alignParentLeft="true"/>
+        android:layout_alignParentLeft="true"
+        android:textSize="8pt"/>
 
     <TextView
         android:id="@+id/value"
@@ -19,6 +20,7 @@
         android:gravity="end"
         android:layout_alignParentRight="true"
         android:paddingRight="30dp"
+        android:textSize="8pt"
         />
 
 </RelativeLayout>

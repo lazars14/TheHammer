@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimary">#5863f8</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
-    <color name="splash_screen_background">#5FD4AF</color>
+    <color name="splash_screen_background">#FFA500</color>
     <color name="splash_screen_text">#000000</color>
-    <color name="nav_header_background">#FFA500</color>
-    <color name="filter_background">#FFFF00</color>
+    <color name="nav_header_background">#5863f8</color>
+    <color name="filter_background">#FFA500</color>
     <color name="spinner_background">#FFFFFF</color>
     <color name="auction_end_date">#FF0000</color>
 </resources>

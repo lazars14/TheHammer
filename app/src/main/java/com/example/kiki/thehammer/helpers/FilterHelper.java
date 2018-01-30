@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * Created by Lazar on 16/1/2018.
  */
@@ -62,10 +64,7 @@ public class FilterHelper {
     }
 
     private boolean checkIfItemValid(int i){
-        boolean valid;
-        valid = getComparingValueItem(i).contains(value);
-
-        return valid;
+        return StringUtils.containsIgnoreCase(getComparingValueItem(i), value);
     }
 
     private String getComparingValueItem(int i){
@@ -88,7 +87,7 @@ public class FilterHelper {
     private boolean checkIfAuctionValid(int i){
         boolean valid;
         if(!criteria.equals("status")){
-            valid = getComparingValueAuction(i).contains(value);
+            valid = StringUtils.containsIgnoreCase(getComparingValueAuction(i), value);
         } else {
             valid = checkIfAuctionEnded(i);
         }
