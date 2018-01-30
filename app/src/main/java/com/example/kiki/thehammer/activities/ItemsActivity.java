@@ -1,5 +1,6 @@
 package com.example.kiki.thehammer.activities;
 
+import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -32,12 +33,9 @@ import com.example.kiki.thehammer.services.NotificationService;
 import com.example.kiki.thehammer.services.UserService;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.iid.FirebaseInstanceId;
 
-import java.lang.ref.PhantomReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,8 +62,6 @@ public class ItemsActivity extends AppCompatActivity implements NavigationView.O
             setRecyclerView();
         }
     };
-
-    private DatabaseReference ref;
 
     private FilterHelper filterHelper;
 
@@ -114,14 +110,14 @@ public class ItemsActivity extends AppCompatActivity implements NavigationView.O
             userService = new UserService();
             String id = userService.addUser();
 
-            NotificationService notificationService = new NotificationService(getApplicationContext(), preferences);
-            notificationService.registerUser(id);
+            NotificationService notificationService = new NotificationService(getApplicationContext());
+            notificationService.registerUserWithToken(id);
         }
     }
 
     private void load_items_from_firebase() {
 
-        AsyncTask<Integer,Void,Void> task = new AsyncTask<Integer, Void, Void>() {
+        @SuppressLint("StaticFieldLeak") AsyncTask<Integer,Void,Void> task = new AsyncTask<Integer, Void, Void>() {
             @Override
             protected Void doInBackground(Integer... integers) {
 //                Query reference = FirebaseDatabase.getInstance().getReference("items").orderByChild("name").equalTo(false, "sold").limitToFirst(3).startAt(0);

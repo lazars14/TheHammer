@@ -1,8 +1,7 @@
 package com.example.kiki.thehammer.activities;
 
-import android.content.ContentResolver;
+import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -27,8 +26,6 @@ import android.widget.Toast;
 
 import com.example.kiki.thehammer.R;
 import com.example.kiki.thehammer.adapters.AuctionsAdapter;
-import com.example.kiki.thehammer.data.TheHammerContract;
-import com.example.kiki.thehammer.helpers.DateHelper;
 import com.example.kiki.thehammer.helpers.DummyData;
 import com.example.kiki.thehammer.helpers.FilterHelper;
 import com.example.kiki.thehammer.helpers.NavigationHelper;
@@ -40,14 +37,10 @@ import com.example.kiki.thehammer.services.BidService;
 import com.example.kiki.thehammer.services.ItemService;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class AuctionsActivity extends AppCompatActivity
@@ -129,7 +122,7 @@ public class AuctionsActivity extends AppCompatActivity
     }
 
     private void load_auctions_from_content_provider(){
-        AsyncTask<Integer,Void,Void> task = new AsyncTask<Integer, Void, Void>() {
+        @SuppressLint("StaticFieldLeak") AsyncTask<Integer,Void,Void> task = new AsyncTask<Integer, Void, Void>() {
 
             @Override
             protected Void doInBackground(Integer... integers) {
@@ -142,41 +135,46 @@ public class AuctionsActivity extends AppCompatActivity
                         for(DataSnapshot bidSnapshot : dataSnapshot.getChildren()){
                             Bid bid = bidSnapshot.getValue(Bid.class);
 
-                            if(bid.getUser().getId().equals(user_id)){
-                                Query q = auctionService.getAuctionById(bid.getAuction().getId());
+                            if(bid != null){
+                                if(bid.getUser().getId().equals(user_id)){
+                                    Query q = auctionService.getAuctionById(bid.getAuction().getId());
 
-                                q.addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(DataSnapshot dataSnapshot) {
-                                        final Auction auction = dataSnapshot.getValue(Auction.class);
-                                        if(!auctions.contains(auction)){
+                                    q.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(DataSnapshot dataSnapshot) {
+                                            final Auction auction = dataSnapshot.getValue(Auction.class);
 
-                                            Query itemQuery = itemService.getReferenceForItemById(auction.getItem().getId());
+                                            if(auction != null){
+                                                if(!auctions.contains(auction)){
 
-                                            itemQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-                                                @Override
-                                                public void onDataChange(DataSnapshot dataSnapshot) {
-                                                    Item item = dataSnapshot.getValue(Item.class);
-                                                    auction.setItem(item);
+                                                    Query itemQuery = itemService.getReferenceForItemById(auction.getItem().getId());
 
-                                                    auctions.add(auction);
-                                                    adapter.notifyDataSetChanged();
+                                                    itemQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                        @Override
+                                                        public void onDataChange(DataSnapshot dataSnapshot) {
+                                                            Item item = dataSnapshot.getValue(Item.class);
+                                                            auction.setItem(item);
+
+                                                            auctions.add(auction);
+                                                            adapter.notifyDataSetChanged();
+                                                        }
+
+                                                        @Override
+                                                        public void onCancelled(DatabaseError databaseError) {
+                                                            Toast.makeText(getApplicationContext(), DummyData.FAILED_TO_LOAD_DATA, Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    });
                                                 }
-
-                                                @Override
-                                                public void onCancelled(DatabaseError databaseError) {
-                                                    Toast.makeText(getApplicationContext(), DummyData.FAILED_TO_LOAD_DATA, Toast.LENGTH_SHORT).show();
-                                                }
-                                            });
+                                            } else Toast.makeText(getApplicationContext(), DummyData.FAILED_TO_LOAD_DATA, Toast.LENGTH_SHORT).show();
                                         }
-                                    }
 
-                                    @Override
-                                    public void onCancelled(DatabaseError databaseError) {
-                                        Toast.makeText(getApplicationContext(), DummyData.FAILED_TO_LOAD_DATA, Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                            }
+                                        @Override
+                                        public void onCancelled(DatabaseError databaseError) {
+                                            Toast.makeText(getApplicationContext(), DummyData.FAILED_TO_LOAD_DATA, Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                }
+                            } else Toast.makeText(getApplicationContext(), DummyData.FAILED_TO_LOAD_DATA, Toast.LENGTH_SHORT).show();
                         }
 
                     }

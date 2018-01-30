@@ -1,8 +1,7 @@
 package com.example.kiki.thehammer.activities;
 
-import android.content.ContentResolver;
+import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -13,7 +12,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,7 +20,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.kiki.thehammer.R;
-import com.example.kiki.thehammer.data.TheHammerContract;
 import com.example.kiki.thehammer.helpers.DateHelper;
 import com.example.kiki.thehammer.helpers.DummyData;
 import com.example.kiki.thehammer.helpers.ImageHelper;
@@ -35,7 +32,6 @@ import com.example.kiki.thehammer.services.UserService;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
@@ -121,7 +117,7 @@ public class AuctionActivity extends AppCompatActivity
             boolean auctionEnded = DateHelper.auctionEnded(end_date);
             if(auctionEnded){
                 // auction over, if user won it display owner info
-                load_auction_winner(auction_id, item_id);
+                load_auction_winner();
             } else {
                 // auction still in progress, display current price
                 load_current_price();
@@ -129,8 +125,8 @@ public class AuctionActivity extends AppCompatActivity
         }
     }
 
-    private void load_auction_winner(String auction_id, String item_id){
-        AsyncTask<Integer,Void,Void> task = new AsyncTask<Integer, Void, Void>() {
+    private void load_auction_winner(){
+        @SuppressLint("StaticFieldLeak") AsyncTask<Integer,Void,Void> task = new AsyncTask<Integer, Void, Void>() {
             @Override
             protected Void doInBackground(Integer... integers) {
                 BidService bidService = new BidService();
@@ -143,25 +139,28 @@ public class AuctionActivity extends AppCompatActivity
 
                         String user_id = preferences.getString("user_id", DummyData.user_id);
 
-                        if(user_id.equals(bid.getUser().getId())){
-                            UserService userService = new UserService();
+                        if(bid != null){
+                            if(user_id.equals(bid.getUser().getId())){
+                                UserService userService = new UserService();
 
-                            Query userQuery = userService.getUserById(bid.getUser().getId());
+                                Query userQuery = userService.getUserById(bid.getUser().getId());
 
-                            userQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
-                                    User user = dataSnapshot.getValue(User.class);
+                                userQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        User user = dataSnapshot.getValue(User.class);
 
-                                    setOwnerInfo(user.getEmail());
-                                }
+                                        if(user != null) setOwnerInfo(user.getEmail());
+                                        else Toast.makeText(getApplicationContext(), DummyData.FAILED_TO_LOAD_DATA, Toast.LENGTH_SHORT).show();
+                                    }
 
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
-                                    Toast.makeText(getApplicationContext(), DummyData.FAILED_TO_LOAD_DATA, Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                        }
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+                                        Toast.makeText(getApplicationContext(), DummyData.FAILED_TO_LOAD_DATA, Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
+                        } else Toast.makeText(getApplicationContext(), DummyData.FAILED_TO_LOAD_DATA, Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
@@ -178,7 +177,7 @@ public class AuctionActivity extends AppCompatActivity
     }
 
     private void load_current_price(){
-        AsyncTask<Integer,Void,Void> task = new AsyncTask<Integer, Void, Void>() {
+        @SuppressLint("StaticFieldLeak") AsyncTask<Integer,Void,Void> task = new AsyncTask<Integer, Void, Void>() {
             @Override
             protected Void doInBackground(Integer... integers) {
                 BidService bidService = new BidService();
@@ -189,9 +188,12 @@ public class AuctionActivity extends AppCompatActivity
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         for(DataSnapshot bidSnapshot : dataSnapshot.getChildren()){
                             Bid bid = bidSnapshot.getValue(Bid.class);
-                            if(bid.getAuction().getId().equals(auction_id) && end_date.after(bid.getDateTime()) && bid.getPrice() > start_price){
-                                max_price = bid.getPrice();
-                            }
+
+                            if(bid != null){
+                                if(bid.getAuction().getId().equals(auction_id) && end_date.after(bid.getDateTime()) && bid.getPrice() > start_price){
+                                    max_price = bid.getPrice();
+                                }
+                            } else Toast.makeText(getApplicationContext(), DummyData.FAILED_TO_LOAD_DATA, Toast.LENGTH_SHORT).show();
                         }
 
                         setCurrentPrice();

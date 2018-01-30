@@ -13,7 +13,6 @@ import com.example.kiki.thehammer.R;
 import com.example.kiki.thehammer.activities.ItemActivity;
 import com.example.kiki.thehammer.helpers.ImageHelper;
 import com.example.kiki.thehammer.model.Item;
-import com.google.firebase.storage.StorageReference;
 
 import java.util.List;
 
@@ -25,7 +24,6 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> 
 
     private Context context;
     private List<Item> items;
-    private StorageReference storageReference;
 
     public ItemsAdapter(Context context, List<Item> items) {
         this.context = context;
@@ -44,7 +42,8 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> 
         holder.item = items.get(position);
         ImageHelper.loadImage(holder.item.getPicture(), context, holder.image, 0);
         holder.name.setText(holder.item.getName());
-        holder.description.setText(holder.item.getDescription().substring(0, 30) + "...");
+        if(holder.item.getDescription().length() > 32) holder.description.setText(holder.item.getDescription().substring(0, 30) + "...");
+        else holder.description.setText(holder.item.getDescription());
     }
 
     @Override

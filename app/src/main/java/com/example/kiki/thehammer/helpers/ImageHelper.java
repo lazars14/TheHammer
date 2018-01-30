@@ -14,7 +14,7 @@ import com.squareup.picasso.Picasso;
 public class ImageHelper {
 
     // 0 for item, 1 for user
-    public static int[] fallback_images = new int[]{R.drawable.default_auction_item, R.drawable.default_user_image};
+    private static int[] fallback_images = new int[]{R.drawable.default_auction_item, R.drawable.default_user_image};
 
     public static void loadImage(String url, final Context context, final ImageView iv, final int fallbackImageId){
         Picasso.with(context).load(url).into(iv, new Callback(){

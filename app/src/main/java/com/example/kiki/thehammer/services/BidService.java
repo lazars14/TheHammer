@@ -1,6 +1,5 @@
 package com.example.kiki.thehammer.services;
 
-import com.example.kiki.thehammer.helpers.DateHelper;
 import com.example.kiki.thehammer.helpers.DummyData;
 import com.example.kiki.thehammer.model.Auction;
 import com.example.kiki.thehammer.model.Bid;

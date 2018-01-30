@@ -1,17 +1,12 @@
 package com.example.kiki.thehammer.fragments;
 
-import android.content.ContentResolver;
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -21,25 +16,23 @@ import android.widget.NumberPicker;
 import android.widget.Toast;
 
 import com.example.kiki.thehammer.R;
-import com.example.kiki.thehammer.activities.ItemsActivity;
 import com.example.kiki.thehammer.adapters.BidsAdapter;
-import com.example.kiki.thehammer.data.TheHammerContract;
 import com.example.kiki.thehammer.helpers.DateHelper;
 import com.example.kiki.thehammer.helpers.DummyData;
 import com.example.kiki.thehammer.model.Auction;
 import com.example.kiki.thehammer.model.Bid;
+import com.example.kiki.thehammer.model.Notification;
 import com.example.kiki.thehammer.model.User;
 import com.example.kiki.thehammer.services.AuctionService;
 import com.example.kiki.thehammer.services.BidService;
+import com.example.kiki.thehammer.services.NotificationService;
 import com.example.kiki.thehammer.services.UserService;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -47,7 +40,6 @@ import java.util.List;
 public class ItemBidsFragment extends Fragment implements View.OnClickListener{
 
     private RecyclerView recyclerView;
-    private GridLayoutManager gridLayoutManager;
     LinearLayoutManager mLayoutManager;
     private FloatingActionButton fab;
     private BidsAdapter adapter;
@@ -56,7 +48,7 @@ public class ItemBidsFragment extends Fragment implements View.OnClickListener{
     private BidService bidService = new BidService();
     private UserService userService = new UserService();
 
-    private String item_id;
+    private String item_id, item_name, item_description, item_image;
     private String auction_id;
     private Date end_date;
     private double start_price;
@@ -73,6 +65,9 @@ public class ItemBidsFragment extends Fragment implements View.OnClickListener{
         Bundle bundle = getActivity().getIntent().getExtras();
         if (bundle != null) {
             item_id = bundle.getString("id");
+            item_name = bundle.getString("name");
+            item_description = bundle.getString("description");
+            item_image = bundle.getString("image");
         }
 
         recyclerView = v.findViewById(R.id.recycler_view);
@@ -97,7 +92,7 @@ public class ItemBidsFragment extends Fragment implements View.OnClickListener{
     private void load_bids_from_firebase(){
         final Date now = new Date();
 
-        AsyncTask<Integer,Void,Void> task = new AsyncTask<Integer, Void, Void>() {
+        @SuppressLint("StaticFieldLeak") AsyncTask<Integer,Void,Void> task = new AsyncTask<Integer, Void, Void>() {
             @Override
             protected Void doInBackground(Integer... integers) {
                 Query query = auctionService.ALL_AUCTIONS_QUERY;
@@ -106,56 +101,61 @@ public class ItemBidsFragment extends Fragment implements View.OnClickListener{
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         for(DataSnapshot auctionSnapshot : dataSnapshot.getChildren()){
                             Auction auction = auctionSnapshot.getValue(Auction.class);
-                            if(auction.getItem().getId().equals(item_id) && auction.getEndDate().after(now)){
-                                auction_id = auction.getId();
-                                end_date = auction.getEndDate();
 
-                                Query bidQuery = bidService.getAllBidsDbReference().orderByChild("price");
+                            if(auction != null){
+                                if(auction.getItem().getId().equals(item_id) && auction.getEndDate().after(now)){
+                                    auction_id = auction.getId();
+                                    end_date = auction.getEndDate();
+                                    start_price = auction.getStartPrice();
 
-                                bidQuery.addValueEventListener(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(DataSnapshot dataSnapshot) {
-                                        for(DataSnapshot bidSnapshot : dataSnapshot.getChildren()){
-                                            final Bid bid = bidSnapshot.getValue(Bid.class);
+                                    Query bidQuery = bidService.getAllBidsDbReference().orderByChild("price");
 
-                                            if(bid.getAuction().getId().equals(auction_id)){
+                                    bidQuery.addValueEventListener(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(DataSnapshot dataSnapshot) {
+                                            for(DataSnapshot bidSnapshot : dataSnapshot.getChildren()){
+                                                final Bid bid = bidSnapshot.getValue(Bid.class);
 
-                                                Query userQuery = userService.getUserById(bid.getUser().getId());
+                                                if(bid != null){
+                                                    if(bid.getAuction().getId().equals(auction_id)){
 
-                                                userQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-                                                    @Override
-                                                    public void onDataChange(DataSnapshot dataSnapshot) {
-                                                        User user = dataSnapshot.getValue(User.class);
-                                                        bid.setUser(user);
+                                                        Query userQuery = userService.getUserById(bid.getUser().getId());
 
-                                                        if(!bids.contains(bid)){
-                                                            bids.add(bid);
-                                                            adapter.notifyDataSetChanged();
+                                                        userQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                            @Override
+                                                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                                                User user = dataSnapshot.getValue(User.class);
+                                                                bid.setUser(user);
 
-                                                            mLayoutManager.scrollToPosition(bids.size() - 1);
-                                                        }
+                                                                if(!bids.contains(bid)){
+                                                                    bids.add(bid);
+                                                                    adapter.notifyDataSetChanged();
 
+                                                                    mLayoutManager.scrollToPosition(bids.size() - 1);
+                                                                }
+
+                                                            }
+
+                                                            @Override
+                                                            public void onCancelled(DatabaseError databaseError) {
+                                                                Toast.makeText(getContext(), DummyData.FAILED_TO_LOAD_DATA, Toast.LENGTH_SHORT).show();
+                                                            }
+                                                        });
                                                     }
-
-                                                    @Override
-                                                    public void onCancelled(DatabaseError databaseError) {
-                                                        Toast.makeText(getContext(), DummyData.FAILED_TO_LOAD_DATA, Toast.LENGTH_SHORT).show();
-                                                    }
-                                                });
-
+                                                } else Toast.makeText(getContext(), DummyData.FAILED_TO_LOAD_DATA, Toast.LENGTH_SHORT).show();
 
                                             }
 
                                         }
 
-                                    }
+                                        @Override
+                                        public void onCancelled(DatabaseError databaseError) {
+                                            Toast.makeText(getContext(), DummyData.FAILED_TO_LOAD_DATA, Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                }
+                            } else Toast.makeText(getContext(), DummyData.FAILED_TO_LOAD_DATA, Toast.LENGTH_SHORT).show();
 
-                                    @Override
-                                    public void onCancelled(DatabaseError databaseError) {
-                                        Toast.makeText(getContext(), DummyData.FAILED_TO_LOAD_DATA, Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                            }
                         }
                     }
 
@@ -183,7 +183,7 @@ public class ItemBidsFragment extends Fragment implements View.OnClickListener{
 
         final NumberPicker euro_picker = dialogView.findViewById(R.id.euro_picker);
         double min_price;
-        if(bids.size() > 0) min_price = bids.get(0).getPrice();
+        if(bids.size() > 0) min_price = bids.get(bids.size() - 1).getPrice();
         else min_price = start_price - 1;
 
         int min_price_int = Integer.parseInt(String.valueOf(Math.round(min_price)));
@@ -202,8 +202,12 @@ public class ItemBidsFragment extends Fragment implements View.OnClickListener{
         cent_picker.setDisplayedValues(cents);
         cent_picker.setMinValue(0);
         cent_picker.setMaxValue(99);
-        // to do
-        cent_picker.setValue(0);
+
+        double cents_from_price = min_price - (int) min_price;
+        double value = Math.round(cents_from_price*100.0)/100.0;
+        int index = (int) (value / 0.01);
+
+        cent_picker.setValue(index + 1);
 
         add_bid_dialog_builder.setView(dialogView);
 
@@ -218,14 +222,38 @@ public class ItemBidsFragment extends Fragment implements View.OnClickListener{
                         } else {
                             double euros = euro_picker.getValue();
                             double cents = cent_picker.getValue();
-                            double euro_cents = euros + cents/100;
+                            final double euro_cents = euros + cents/100;
 
                             if(euro_cents > bids.get(bids.size() - 1).getPrice()){
-                                BidService bidService = new BidService();
-                                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-                                bidService.addBid(euro_cents, new Date(), new Auction(auction_id), new User(preferences.getString("user_id", DummyData.user_id)));
+                                final String last_bid_user_id = bids.get(bids.size() - 1).getUser().getId();
 
-                                Toast.makeText(getContext(), "Bid successfull", Toast.LENGTH_SHORT).show();
+                                final NotificationService notificationService = new NotificationService(getContext());
+                                DatabaseReference dbReference = notificationService.getAllNotifications();
+
+                                dbReference.addValueEventListener(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        for(DataSnapshot notificationSnap : dataSnapshot.getChildren()){
+                                            Notification notification = notificationSnap.getValue(Notification.class);
+
+                                            if(notification != null){
+                                                if(notification.getUserId().equals(last_bid_user_id)){
+                                                    BidService bidService = new BidService();
+                                                    bidService.addBid(euro_cents, new Date(), new Auction(auction_id), new User(last_bid_user_id));
+
+                                                    notificationService.sendNotification(notificationService.buildMessage(item_id, item_name, item_description, item_image));
+                                                    Toast.makeText(getContext(), "Bid successfull", Toast.LENGTH_SHORT).show();
+                                                }
+                                            } else Toast.makeText(getContext(), DummyData.FAILED_TO_LOAD_DATA, Toast.LENGTH_SHORT).show();
+
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+                                        Toast.makeText(getContext(), DummyData.FAILED_TO_LOAD_DATA, Toast.LENGTH_SHORT).show();
+                                    }
+                                });
                             } else {
                                 Toast.makeText(getContext(), "Bid failed - not bigger than last bid", Toast.LENGTH_SHORT).show();
                             }

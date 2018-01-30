@@ -2,7 +2,6 @@ package com.example.kiki.thehammer.adapters;
 
 import android.content.Context;
 import android.content.Intent;
-import android.media.Image;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,8 +15,6 @@ import com.example.kiki.thehammer.helpers.DateHelper;
 import com.example.kiki.thehammer.helpers.ImageHelper;
 import com.example.kiki.thehammer.model.Auction;
 
-import java.text.DateFormat;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -46,7 +43,8 @@ public class AuctionsAdapter extends RecyclerView.Adapter<AuctionsAdapter.ViewHo
         holder.auction = auctions.get(position);
         ImageHelper.loadImage(holder.auction.getItem().getPicture(), context, holder.item_image, 0);
         holder.item_name.setText(holder.auction.getItem().getName());
-        holder.item_description.setText(holder.auction.getItem().getDescription().substring(0, 20) + "...");
+        if(holder.auction.getItem().getDescription().length() > 22) holder.item_description.setText(holder.auction.getItem().getDescription().substring(0, 20) + "...");
+        else holder.item_description.setText(holder.auction.getItem().getDescription());
         holder.start_price.setText("Start price: " + holder.auction.getStartPrice());
         holder.end_date.setText("End: " + DateHelper.calculateRemainingTime(holder.auction.getEndDate()));
     }

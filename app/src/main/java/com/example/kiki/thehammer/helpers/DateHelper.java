@@ -1,9 +1,6 @@
 package com.example.kiki.thehammer.helpers;
 
 import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
@@ -22,11 +19,8 @@ public class DateHelper {
 
     public static boolean auctionEnded(Date endDate){
         Date now = new Date();
-        if(now.after(endDate)){
-            return true;
-        }
 
-        return false;
+        return now.after(endDate);
     }
 
     public static String calculateRemainingTime(Date endDate){
@@ -49,7 +43,12 @@ public class DateHelper {
         long[] time = new long[]{diffInDays, diffInHours, diffInMin};
 
         for(int i = 0; i < time.length; i++){
-            if(time[i] != 0) sb.append(time[i] + whitespace + timeNames[i] + whitespace);
+            if(time[i] != 0){
+                sb.append(time[i]);
+                sb.append(whitespace);
+                sb.append(timeNames[i]);
+                sb.append(whitespace);
+            }
         }
 
         return sb.toString();

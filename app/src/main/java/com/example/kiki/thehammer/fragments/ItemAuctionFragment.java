@@ -1,7 +1,6 @@
 package com.example.kiki.thehammer.fragments;
 
-import android.content.ContentResolver;
-import android.database.Cursor;
+import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -13,7 +12,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.kiki.thehammer.R;
-import com.example.kiki.thehammer.data.TheHammerContract;
 import com.example.kiki.thehammer.helpers.DateHelper;
 import com.example.kiki.thehammer.helpers.DummyData;
 import com.example.kiki.thehammer.helpers.ImageHelper;
@@ -61,7 +59,7 @@ public class ItemAuctionFragment extends Fragment {
     }
 
     private void load_auction_info() {
-        AsyncTask<Integer,Void,Void> task = new AsyncTask<Integer, Void, Void>() {
+        @SuppressLint("StaticFieldLeak") AsyncTask<Integer,Void,Void> task = new AsyncTask<Integer, Void, Void>() {
             @Override
             protected Void doInBackground(Integer... integers) {
                 Query query = AuctionService.ALL_AUCTIONS_QUERY;
@@ -72,11 +70,12 @@ public class ItemAuctionFragment extends Fragment {
                         for(DataSnapshot auctionSnapshot : dataSnapshot.getChildren()){
                             Auction auction = auctionSnapshot.getValue(Auction.class);
 
-//                            Toast.makeText(getContext(), auction.getItem().getId() + " iz aukcije, " + item_id + " iz item-a", Toast.LENGTH_SHORT).show();
+                            if(auction != null){
+                                if(auction.getItem().getId().equals(item_id) && auction.getEndDate().after(now)){
+                                    setAuctionInfo(auction);
+                                }
+                            } else Toast.makeText(getContext(), DummyData.FAILED_TO_LOAD_DATA, Toast.LENGTH_SHORT).show();
 
-                            if(auction.getItem().getId().equals(item_id) && auction.getEndDate().after(now)){
-                                setAuctionInfo(auction);
-                            }
                         }
                     }
 

@@ -51,7 +51,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     private static void setPreferenceChangedPref(){
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean("something_changed", true);
-        editor.commit();
+        editor.apply();
     }
 
     /**

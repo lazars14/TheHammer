@@ -3,8 +3,6 @@ package com.example.kiki.thehammer.data;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
-import java.net.URI;
-
 /**
  * Created by Lazar on 6/7/2017.
  */

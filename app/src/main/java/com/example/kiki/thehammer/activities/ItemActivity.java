@@ -79,6 +79,14 @@ public class ItemActivity extends AppCompatActivity
 
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
+
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {
+            boolean bids = bundle.getBoolean("bids");
+
+            if(bids) mViewPager.setCurrentItem(1);
+        }
+
     }
 
     @Override

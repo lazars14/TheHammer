@@ -1,7 +1,6 @@
 package com.example.kiki.thehammer.data;
 
 import android.content.ContentProvider;
-import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.UriMatcher;

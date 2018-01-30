@@ -13,7 +13,6 @@ import com.example.kiki.thehammer.helpers.DateHelper;
 import com.example.kiki.thehammer.helpers.ImageHelper;
 import com.example.kiki.thehammer.model.Bid;
 
-import java.text.DateFormat;
 import java.util.List;
 
 /**

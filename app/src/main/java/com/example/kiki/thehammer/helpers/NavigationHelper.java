@@ -43,7 +43,7 @@ public class NavigationHelper {
         address = headerView.findViewById(R.id.address);
     }
 
-    public void initUserInfo(SharedPreferences preferences){
+    private void initUserInfo(SharedPreferences preferences){
         String firstAndLastnameText = preferences.getString("firstname", "John") + " " + preferences.getString("lastname", "Doe");
 
         String url = preferences.getString("image", not_changed);
