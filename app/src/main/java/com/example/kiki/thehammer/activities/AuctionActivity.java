@@ -1,7 +1,11 @@
 package com.example.kiki.thehammer.activities;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -23,11 +27,13 @@ import com.example.kiki.thehammer.R;
 import com.example.kiki.thehammer.helpers.DateHelper;
 import com.example.kiki.thehammer.helpers.DummyData;
 import com.example.kiki.thehammer.helpers.ImageHelper;
+import com.example.kiki.thehammer.helpers.InternetHelper;
 import com.example.kiki.thehammer.helpers.NavigationHelper;
 import com.example.kiki.thehammer.helpers.ValuePairViewHelper;
 import com.example.kiki.thehammer.model.Bid;
 import com.example.kiki.thehammer.model.User;
 import com.example.kiki.thehammer.services.BidService;
+import com.example.kiki.thehammer.services.InternetService;
 import com.example.kiki.thehammer.services.UserService;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -54,12 +60,33 @@ public class AuctionActivity extends AppCompatActivity
     private NavigationHelper navHelper;
     private DrawerLayout drawer;
     private NavigationView navigationView;
+    private ImageView item_imageView;
+    private String item_image;
 
     private static final Handler handler = new Handler();
     private final Runnable action = new Runnable() {
         @Override
         public void run() {
             navHelper.checkIfPrefChanged();
+        }
+    };
+
+    private InternetService internetService = new InternetService(){
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
+
+                boolean noConnectivity = intent.getBooleanExtra(
+                        ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
+
+                if (!noConnectivity) {
+                    load_changeable_auction_info();
+                    ImageHelper.loadImage(item_image, getApplicationContext(), item_imageView, 0);
+                    handler.post(action);
+                } else {
+                    Toast.makeText(getApplicationContext(), DummyData.TURN_ON_INTERNET, Toast.LENGTH_SHORT).show();
+                }
+            }
         }
     };
 
@@ -91,6 +118,10 @@ public class AuctionActivity extends AppCompatActivity
 
         navHelper = new NavigationHelper(getApplicationContext(), navigationView);
 
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+        registerReceiver(internetService, filter);
+
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             auction_id = bundle.getString("auction_id");
@@ -99,10 +130,10 @@ public class AuctionActivity extends AppCompatActivity
             View item_info_view = findViewById(R.id.item_info);
             TextView name = item_info_view.findViewById(R.id.name);
             TextView description = item_info_view.findViewById(R.id.description);
-            ImageView imageView = item_info_view.findViewById(R.id.image);
+            item_imageView = item_info_view.findViewById(R.id.image);
             name.setText(bundle.getString("item_name"));
             description.setText(bundle.getString("item_description"));
-            ImageHelper.loadImage(bundle.getString("item_image"), getApplicationContext(), imageView, 0);
+            item_image = bundle.getString("item_image");
 
             start_date = new Date(bundle.getLong("auction_start_date"));
             end_date =  new Date(bundle.getLong("auction_end_date"));
@@ -114,14 +145,24 @@ public class AuctionActivity extends AppCompatActivity
             ValuePairViewHelper.setLabelValuePair(auction_info_view, R.id.start_date, "Start Date:", DateHelper.dateToString(start_date));
             ValuePairViewHelper.setLabelValuePair(auction_info_view, R.id.end_date, "End Date:", DateHelper.dateToString(end_date));
 
-            boolean auctionEnded = DateHelper.auctionEnded(end_date);
-            if(auctionEnded){
-                // auction over, if user won it display owner info
-                load_auction_winner();
+            if(InternetHelper.isNetworkAvailable(this)){
+                load_changeable_auction_info();
+                ImageHelper.loadImage(item_image, getApplicationContext(), item_imageView, 0);
             } else {
-                // auction still in progress, display current price
-                load_current_price();
+                Toast.makeText(this, "Turn on internet to load data!", Toast.LENGTH_SHORT).show();
             }
+
+        }
+    }
+
+    private void load_changeable_auction_info(){
+        boolean auctionEnded = DateHelper.auctionEnded(end_date);
+        if(auctionEnded){
+            // auction over, if user won it display owner info
+            load_auction_winner();
+        } else {
+            // auction still in progress, display current price
+            load_current_price();
         }
     }
 

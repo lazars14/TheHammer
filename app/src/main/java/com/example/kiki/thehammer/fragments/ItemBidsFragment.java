@@ -19,6 +19,7 @@ import com.example.kiki.thehammer.R;
 import com.example.kiki.thehammer.adapters.BidsAdapter;
 import com.example.kiki.thehammer.helpers.DateHelper;
 import com.example.kiki.thehammer.helpers.DummyData;
+import com.example.kiki.thehammer.helpers.InternetHelper;
 import com.example.kiki.thehammer.model.Auction;
 import com.example.kiki.thehammer.model.Bid;
 import com.example.kiki.thehammer.model.Notification;
@@ -84,7 +85,12 @@ public class ItemBidsFragment extends Fragment implements View.OnClickListener{
         fab = v.findViewById(R.id.fab);
         fab.setOnClickListener(this);
 
-        load_bids_from_firebase();
+        if(InternetHelper.isNetworkAvailable(getContext())){
+            load_bids_from_firebase();
+        } else {
+            Toast.makeText(getContext(), DummyData.TURN_ON_INTERNET_DATA, Toast.LENGTH_SHORT).show();
+        }
+
 
         return v;
     }
@@ -227,33 +233,37 @@ public class ItemBidsFragment extends Fragment implements View.OnClickListener{
                             if(euro_cents > bids.get(bids.size() - 1).getPrice()){
                                 final String last_bid_user_id = bids.get(bids.size() - 1).getUser().getId();
 
-                                final NotificationService notificationService = new NotificationService(getContext());
-                                DatabaseReference dbReference = notificationService.getAllNotifications();
+                                if(InternetHelper.isNetworkAvailable(getContext())){
+                                    final NotificationService notificationService = new NotificationService(getContext());
+                                    DatabaseReference dbReference = notificationService.getAllNotifications();
 
-                                dbReference.addValueEventListener(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(DataSnapshot dataSnapshot) {
-                                        for(DataSnapshot notificationSnap : dataSnapshot.getChildren()){
-                                            Notification notification = notificationSnap.getValue(Notification.class);
+                                    dbReference.addValueEventListener(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(DataSnapshot dataSnapshot) {
+                                            for(DataSnapshot notificationSnap : dataSnapshot.getChildren()){
+                                                Notification notification = notificationSnap.getValue(Notification.class);
 
-                                            if(notification != null){
-                                                if(notification.getUserId().equals(last_bid_user_id)){
-                                                    BidService bidService = new BidService();
-                                                    bidService.addBid(euro_cents, new Date(), new Auction(auction_id), new User(last_bid_user_id));
+                                                if(notification != null){
+                                                    if(notification.getUserId().equals(last_bid_user_id)){
+                                                        BidService bidService = new BidService();
+                                                        bidService.addBid(euro_cents, new Date(), new Auction(auction_id), new User(last_bid_user_id));
 
-                                                    notificationService.sendNotification(notificationService.buildMessage(item_id, item_name, item_description, item_image));
-                                                    Toast.makeText(getContext(), "Bid successfull", Toast.LENGTH_SHORT).show();
-                                                }
-                                            } else Toast.makeText(getContext(), DummyData.FAILED_TO_LOAD_DATA, Toast.LENGTH_SHORT).show();
+                                                        notificationService.sendNotification(notificationService.buildMessage(item_id, item_name, item_description, item_image));
+                                                        Toast.makeText(getContext(), "Bid successfull", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                } else Toast.makeText(getContext(), DummyData.FAILED_TO_LOAD_DATA, Toast.LENGTH_SHORT).show();
 
+                                            }
                                         }
-                                    }
 
-                                    @Override
-                                    public void onCancelled(DatabaseError databaseError) {
-                                        Toast.makeText(getContext(), DummyData.FAILED_TO_LOAD_DATA, Toast.LENGTH_SHORT).show();
-                                    }
-                                });
+                                        @Override
+                                        public void onCancelled(DatabaseError databaseError) {
+                                            Toast.makeText(getContext(), DummyData.FAILED_TO_LOAD_DATA, Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                } else {
+                                    Toast.makeText(getContext(), "Turn on internet to post bid!", Toast.LENGTH_SHORT).show();
+                                }
                             } else {
                                 Toast.makeText(getContext(), "Bid failed - not bigger than last bid", Toast.LENGTH_SHORT).show();
                             }

@@ -25,6 +25,8 @@ public class DummyData {
     public static final String NOT_REGISTERED = "NOT REGISTERED";
 
     public static final String FAILED_TO_LOAD_DATA = "Failed to load data";
+    public static final String TURN_ON_INTERNET = "Turn on your internet for current data!";
+    public static final String TURN_ON_INTERNET_DATA = "Turn on internet to load data!";
 
     // Item dummy data
 

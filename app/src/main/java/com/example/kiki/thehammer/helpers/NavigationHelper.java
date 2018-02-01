@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.kiki.thehammer.R;
 import com.example.kiki.thehammer.services.UserService;
@@ -66,9 +67,20 @@ public class NavigationHelper {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(appContext);
         boolean somethingChanged = preferences.getBoolean("something_changed", false);
         if(somethingChanged) {
-            UserService userService = new UserService();
-            userService.updateUser(appContext);
-            initUserInfo(preferences);
+            if(InternetHelper.isNetworkAvailable(appContext)){
+                UserService userService = new UserService();
+                userService.updateUser(appContext);
+
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putBoolean("something_changed", false);
+                editor.apply();
+
+            } else {
+                Toast.makeText(appContext, "Turn on internet to refresh your info!", Toast.LENGTH_SHORT).show();
+            }
+
         }
+
+        initUserInfo(preferences);
     }
 }

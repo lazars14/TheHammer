@@ -1,7 +1,11 @@
 package com.example.kiki.thehammer.activities;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -31,12 +35,14 @@ import com.example.kiki.thehammer.R;
 import com.example.kiki.thehammer.adapters.AuctionsAdapter;
 import com.example.kiki.thehammer.helpers.DummyData;
 import com.example.kiki.thehammer.helpers.FilterHelper;
+import com.example.kiki.thehammer.helpers.InternetHelper;
 import com.example.kiki.thehammer.helpers.NavigationHelper;
 import com.example.kiki.thehammer.model.Auction;
 import com.example.kiki.thehammer.model.Bid;
 import com.example.kiki.thehammer.model.Item;
 import com.example.kiki.thehammer.services.AuctionService;
 import com.example.kiki.thehammer.services.BidService;
+import com.example.kiki.thehammer.services.InternetService;
 import com.example.kiki.thehammer.services.ItemService;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -80,6 +86,23 @@ public class AuctionsActivity extends AppCompatActivity
         }
     };
 
+    private InternetService internetService = new InternetService(){
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
+
+                boolean noConnectivity = intent.getBooleanExtra(
+                        ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
+
+                if (!noConnectivity) {
+                    load_auctions_from_firebase();
+                    handler.post(action);
+                } else {
+                    Toast.makeText(getApplicationContext(), DummyData.TURN_ON_INTERNET, Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+    };
 
     @Override
     public void onResume(){
@@ -122,10 +145,20 @@ public class AuctionsActivity extends AppCompatActivity
 
         setRecyclerView();
         user_id = preferences.getString("user_id", DummyData.user_id);
-        load_auctions_from_content_provider();
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+        registerReceiver(internetService, filter);
+
+        if(InternetHelper.isNetworkAvailable(this)){
+            load_auctions_from_firebase();
+        } else {
+            Toast.makeText(this, "Turn on internet to load data!", Toast.LENGTH_SHORT).show();
+        }
+
     }
 
-    private void load_auctions_from_content_provider(){
+    private void load_auctions_from_firebase(){
         @SuppressLint("StaticFieldLeak") AsyncTask<Integer,Void,Void> task = new AsyncTask<Integer, Void, Void>() {
 
             @Override

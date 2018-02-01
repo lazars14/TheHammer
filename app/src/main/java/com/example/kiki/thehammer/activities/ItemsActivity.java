@@ -1,7 +1,11 @@
 package com.example.kiki.thehammer.activities;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -16,6 +20,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,8 +33,10 @@ import com.example.kiki.thehammer.R;
 import com.example.kiki.thehammer.adapters.ItemsAdapter;
 import com.example.kiki.thehammer.helpers.DummyData;
 import com.example.kiki.thehammer.helpers.FilterHelper;
+import com.example.kiki.thehammer.helpers.InternetHelper;
 import com.example.kiki.thehammer.helpers.NavigationHelper;
 import com.example.kiki.thehammer.model.Item;
+import com.example.kiki.thehammer.services.InternetService;
 import com.example.kiki.thehammer.services.ItemService;
 import com.example.kiki.thehammer.services.NotificationService;
 import com.example.kiki.thehammer.services.UserService;
@@ -68,6 +75,24 @@ public class ItemsActivity extends AppCompatActivity implements NavigationView.O
 
     private FilterHelper filterHelper;
 
+    private InternetService internetService = new InternetService(){
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
+
+                boolean noConnectivity = intent.getBooleanExtra(
+                        ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
+
+                if (!noConnectivity) {
+                    load_items_from_firebase();
+                    handler.post(action);
+                } else {
+                    Toast.makeText(getApplicationContext(), DummyData.TURN_ON_INTERNET, Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+    };
+
     @Override
     public void onResume(){
         super.onResume();
@@ -102,9 +127,18 @@ public class ItemsActivity extends AppCompatActivity implements NavigationView.O
         recyclerView.setLayoutManager(gridLayoutManager);
 
         setRecyclerView();
-        load_items_from_firebase();
 
-        checkIfRegistered();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+        registerReceiver(internetService, filter);
+
+        if(InternetHelper.isNetworkAvailable(this)){
+            load_items_from_firebase();
+            checkIfRegistered();
+        } else {
+            Toast.makeText(this, DummyData.TURN_ON_INTERNET_DATA, Toast.LENGTH_SHORT).show();
+        }
+
     }
 
     private void checkIfRegistered(){
@@ -123,7 +157,6 @@ public class ItemsActivity extends AppCompatActivity implements NavigationView.O
         @SuppressLint("StaticFieldLeak") AsyncTask<Integer,Void,Void> task = new AsyncTask<Integer, Void, Void>() {
             @Override
             protected Void doInBackground(Integer... integers) {
-//                Query reference = FirebaseDatabase.getInstance().getReference("items").orderByChild("name").equalTo(false, "sold").limitToFirst(3).startAt(0);
 
                 Query reference = ItemService.ALL_ITEMS_QUERY;
 
@@ -133,9 +166,12 @@ public class ItemsActivity extends AppCompatActivity implements NavigationView.O
                         for(DataSnapshot itemSnapshot : dataSnapshot.getChildren()){
                             Item item = itemSnapshot.getValue(Item.class);
 
-                            items.add(item);
+                            if(!items.contains(item)){
+                                items.add(item);
 
-                            adapter.notifyDataSetChanged();
+                                adapter.notifyDataSetChanged();
+                            }
+
                         }
                     }
 

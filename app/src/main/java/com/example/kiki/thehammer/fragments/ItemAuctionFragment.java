@@ -1,6 +1,10 @@
 package com.example.kiki.thehammer.fragments;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -15,9 +19,11 @@ import com.example.kiki.thehammer.R;
 import com.example.kiki.thehammer.helpers.DateHelper;
 import com.example.kiki.thehammer.helpers.DummyData;
 import com.example.kiki.thehammer.helpers.ImageHelper;
+import com.example.kiki.thehammer.helpers.InternetHelper;
 import com.example.kiki.thehammer.helpers.ValuePairViewHelper;
 import com.example.kiki.thehammer.model.Auction;
 import com.example.kiki.thehammer.services.AuctionService;
+import com.example.kiki.thehammer.services.InternetService;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.Query;
@@ -29,6 +35,26 @@ public class ItemAuctionFragment extends Fragment {
 
     private View auction_info_view;
     private String item_id;
+    private ImageView item_imageView;
+    private String item_image;
+
+    private InternetService internetService = new InternetService(){
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
+
+                boolean noConnectivity = intent.getBooleanExtra(
+                        ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
+
+                if (!noConnectivity) {
+                    load_auction_info();
+                    ImageHelper.loadImage(item_image, getContext(), item_imageView, 0);
+                } else {
+                    Toast.makeText(getContext(), DummyData.TURN_ON_INTERNET, Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+    };
 
     public ItemAuctionFragment() {
         // Required empty public constructor
@@ -40,19 +66,29 @@ public class ItemAuctionFragment extends Fragment {
         View v = inflater.inflate(R.layout.item_auction_fragment, container, false);
         Bundle bundle = getActivity().getIntent().getExtras();
         if (bundle != null) {
-            String item_image = bundle.getString("image");
+            item_image = bundle.getString("image");
             View item_info_view = v.findViewById(R.id.item_info);
             TextView name = item_info_view.findViewById(R.id.name);
             TextView description = item_info_view.findViewById(R.id.description);
-            ImageView imageView = item_info_view.findViewById(R.id.image);
+            item_imageView = item_info_view.findViewById(R.id.image);
 
             name.setText(bundle.getString("name"));
             description.setText(bundle.getString("description"));
-            ImageHelper.loadImage(item_image, getContext(), imageView, 0);
             auction_info_view = v.findViewById(R.id.auction_info);
 
             item_id = bundle.getString("id");
-            load_auction_info();
+
+            IntentFilter filter = new IntentFilter();
+            filter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+            getActivity().registerReceiver(internetService, filter);
+
+            if(InternetHelper.isNetworkAvailable(getContext())){
+                load_auction_info();
+                ImageHelper.loadImage(item_image, getContext(), item_imageView, 0);
+            } else {
+                Toast.makeText(getContext(), "Turn on internet to load data!", Toast.LENGTH_SHORT).show();
+            }
+
         }
 
         return v;
