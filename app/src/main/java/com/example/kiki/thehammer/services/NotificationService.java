@@ -96,27 +96,8 @@ public class NotificationService {
         });
     }
 
-    public void sendNotification(String message){
-        sendMessage(preferences.getString("notification_token", "somehting"), message);
-    }
-
-    public String buildMessage(String item_id, String item_name, String item_description, String item_image) {
-
-        StringBuilder value = new StringBuilder();
-        value.append(item_id);
-        value.append(SEPARATOR);
-        value.append(item_name);
-        value.append(SEPARATOR);
-        value.append(item_description);
-        value.append(SEPARATOR);
-        value.append(item_image);
-
-        return value.toString();
-    }
-
     @SuppressLint("StaticFieldLeak")
-    private void sendMessage(final String recipient, final String message) {
-
+    public void sendNotification(final String token, final String message){
         new AsyncTask<String, String, String>() {
             @Override
             protected String doInBackground(String... params) {
@@ -126,7 +107,7 @@ public class NotificationService {
                     JSONObject data = new JSONObject();
                     data.put("message", message);
                     root.put("data", data);
-                    root.put("to", recipient);
+                    root.put("to", token);
 
                     RequestBody body = RequestBody.create(JSON, root.toString());
                     Request request = new Request.Builder()
@@ -143,4 +124,19 @@ public class NotificationService {
 
         }.execute();
     }
+
+    public String buildMessage(String item_id, String item_name, String item_description, String item_image) {
+
+        StringBuilder value = new StringBuilder();
+        value.append(item_id);
+        value.append(SEPARATOR);
+        value.append(item_name);
+        value.append(SEPARATOR);
+        value.append(item_description);
+        value.append(SEPARATOR);
+        value.append(item_image);
+
+        return value.toString();
+    }
+
 }

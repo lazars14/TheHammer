@@ -4,9 +4,11 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
@@ -154,7 +156,7 @@ public class ItemBidsFragment extends Fragment implements View.OnClickListener{
                                     end_date = auction.getEndDate();
                                     start_price = auction.getStartPrice();
 
-                                    Query bidQuery = bidService.getAllBidsDbReference().orderByChild("price");
+                                    Query bidQuery = bidService.getAllBidsDbReference();
 
                                     bidQuery.addValueEventListener(new ValueEventListener() {
                                         @Override
@@ -165,28 +167,12 @@ public class ItemBidsFragment extends Fragment implements View.OnClickListener{
                                                 if(bid != null){
                                                     if(bid.getAuction().getId().equals(auction_id)){
 
-                                                        Query userQuery = userService.getUserById(bid.getUser().getId());
+                                                        if(!bidsListContainsBid(bid.getId())){
+                                                            bids.add(bid);
+                                                            adapter.notifyDataSetChanged();
 
-                                                        userQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-                                                            @Override
-                                                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                                                User user = dataSnapshot.getValue(User.class);
-                                                                bid.setUser(user);
-
-                                                                if(!bids.contains(bid)){
-                                                                    bids.add(bid);
-                                                                    adapter.notifyDataSetChanged();
-
-                                                                    mLayoutManager.scrollToPosition(bids.size() - 1);
-                                                                }
-
-                                                            }
-
-                                                            @Override
-                                                            public void onCancelled(DatabaseError databaseError) {
-                                                                Toast.makeText(getContext(), DummyData.FAILED_TO_LOAD_DATA, Toast.LENGTH_SHORT).show();
-                                                            }
-                                                        });
+                                                            mLayoutManager.scrollToPosition(bids.size() - 1);
+                                                        }
                                                     }
                                                 } else Toast.makeText(getContext(), DummyData.FAILED_TO_LOAD_DATA, Toast.LENGTH_SHORT).show();
 
@@ -216,6 +202,14 @@ public class ItemBidsFragment extends Fragment implements View.OnClickListener{
         };
 
         task.execute();
+    }
+
+    private boolean bidsListContainsBid(String bidId){
+        for(Bid b : bids){
+            if(b.getId().equals(bidId)) return true;
+        }
+
+        return false;
     }
 
     @Override
@@ -286,9 +280,12 @@ public class ItemBidsFragment extends Fragment implements View.OnClickListener{
                                                 if(notification != null){
                                                     if(notification.getUserId().equals(last_bid_user_id)){
                                                         BidService bidService = new BidService();
-                                                        bidService.addBid(euro_cents, new Date(), new Auction(auction_id), new User(last_bid_user_id));
+                                                        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+                                                        bidService.addBid(euro_cents, new Date(), new Auction(auction_id), new User(preferences.getString("user_id", DummyData.user_id)));
 
-                                                        notificationService.sendNotification(notificationService.buildMessage(item_id, item_name, item_description, item_image));
+                                                        String token = notification.getToken();
+                                                        String message = notificationService.buildMessage(item_id, item_name, item_description, item_image);
+                                                        notificationService.sendNotification(token, message);
                                                         Toast.makeText(getContext(), "Bid successfull", Toast.LENGTH_SHORT).show();
                                                     }
                                                 } else Toast.makeText(getContext(), DummyData.FAILED_TO_LOAD_DATA, Toast.LENGTH_SHORT).show();
