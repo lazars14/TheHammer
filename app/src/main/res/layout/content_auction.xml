@@ -1,32 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.example.kiki.thehammer.activities.AuctionActivity"
-    tools:showIn="@layout/app_bar_auction">
-
-        <TextView
-            android:layout_width="wrap_content"
+    >
+        <LinearLayout android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:text="@string/item_info_title"
-            android:textColor="@color/splash_screen_text"
-            android:textSize="10pt"/>
+            xmlns:tools="http://schemas.android.com/tools"
+            android:orientation="vertical"
+            tools:context="com.example.kiki.thehammer.activities.AuctionActivity"
+            xmlns:android="http://schemas.android.com/apk/res/android">
 
-        <include layout="@layout/auction_item_info" android:id="@+id/item_info"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:text="@string/item_info_title"
+                    android:textColor="@color/splash_screen_text"
+                    android:textSize="10pt"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:text="@string/auction_info_title"
-            android:textColor="@color/splash_screen_text"
-            android:textSize="10pt"/>
+                <include layout="@layout/auction_item_info" android:id="@+id/item_info"/>
 
-        <include layout="@layout/item_details_auction_info" android:id="@+id/auction_info"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:text="@string/auction_info_title"
+                    android:textColor="@color/splash_screen_text"
+                    android:textSize="10pt"/>
 
-</LinearLayout>
+                <include layout="@layout/item_details_auction_info" android:id="@+id/auction_info"/>
+
+        </LinearLayout>
+</ScrollView>

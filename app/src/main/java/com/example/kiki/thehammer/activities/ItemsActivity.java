@@ -80,24 +80,36 @@ public class ItemsActivity extends AppCompatActivity implements NavigationView.O
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
 
-                boolean noConnectivity = intent.getBooleanExtra(
-                        ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
+                if(!activity_paused){
+                    boolean noConnectivity = intent.getBooleanExtra(
+                            ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
 
-                if (!noConnectivity) {
-                    load_items_from_firebase();
-                    handler.post(action);
-                } else {
-                    Toast.makeText(getApplicationContext(), DummyData.TURN_ON_INTERNET, Toast.LENGTH_SHORT).show();
+                    if (!noConnectivity) {
+                        load_items_from_firebase();
+                        handler.post(action);
+                    } else {
+                        Toast.makeText(getApplicationContext(), DummyData.TURN_ON_INTERNET, Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         }
     };
 
+    private boolean activity_paused;
+
     @Override
     public void onResume(){
         super.onResume();
 
+        activity_paused = false;
         handler.post(action);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        activity_paused = true;
     }
 
     @Override
@@ -166,7 +178,7 @@ public class ItemsActivity extends AppCompatActivity implements NavigationView.O
                         for(DataSnapshot itemSnapshot : dataSnapshot.getChildren()){
                             Item item = itemSnapshot.getValue(Item.class);
 
-                            if(!items.contains(item)){
+                            if(!checkIfExists(item.getId())){
                                 items.add(item);
 
                                 adapter.notifyDataSetChanged();
@@ -188,7 +200,17 @@ public class ItemsActivity extends AppCompatActivity implements NavigationView.O
         task.execute();
     }
 
-    public void setSpinnerData(){
+    private boolean checkIfExists(String itemId){
+        for(Item i : items){
+            if(i.getId().equals(itemId)){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void setSpinnerData(){
         View filter_view = findViewById(R.id.items_filter);
         spinner = filter_view.findViewById(R.id.spinner);
 

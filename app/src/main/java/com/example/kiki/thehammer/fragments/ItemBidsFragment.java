@@ -1,7 +1,10 @@
 package com.example.kiki.thehammer.fragments;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -19,6 +22,7 @@ import com.example.kiki.thehammer.R;
 import com.example.kiki.thehammer.adapters.BidsAdapter;
 import com.example.kiki.thehammer.helpers.DateHelper;
 import com.example.kiki.thehammer.helpers.DummyData;
+import com.example.kiki.thehammer.helpers.ImageHelper;
 import com.example.kiki.thehammer.helpers.InternetHelper;
 import com.example.kiki.thehammer.model.Auction;
 import com.example.kiki.thehammer.model.Bid;
@@ -26,6 +30,7 @@ import com.example.kiki.thehammer.model.Notification;
 import com.example.kiki.thehammer.model.User;
 import com.example.kiki.thehammer.services.AuctionService;
 import com.example.kiki.thehammer.services.BidService;
+import com.example.kiki.thehammer.services.InternetService;
 import com.example.kiki.thehammer.services.NotificationService;
 import com.example.kiki.thehammer.services.UserService;
 import com.google.firebase.database.DataSnapshot;
@@ -54,6 +59,41 @@ public class ItemBidsFragment extends Fragment implements View.OnClickListener{
     private Date end_date;
     private double start_price;
     private String[] cents;
+
+    private boolean isPaused;
+
+    private InternetService internetService = new InternetService(){
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
+
+                if(!isPaused){
+                    boolean noConnectivity = intent.getBooleanExtra(
+                            ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
+
+                    if (!noConnectivity) {
+                        load_bids_from_firebase();
+                    } else {
+                        Toast.makeText(getContext(), DummyData.TURN_ON_INTERNET, Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        }
+    };
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        isPaused = true;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        isPaused = false;
+    }
 
     public ItemBidsFragment() {
         // Required empty public constructor

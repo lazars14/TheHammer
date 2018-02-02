@@ -76,32 +76,46 @@ public class AuctionActivity extends AppCompatActivity
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
 
-                boolean noConnectivity = intent.getBooleanExtra(
-                        ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
+                if(!isPaused){
+                    boolean noConnectivity = intent.getBooleanExtra(
+                            ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
 
-                if (!noConnectivity) {
-                    load_changeable_auction_info();
-                    ImageHelper.loadImage(item_image, getApplicationContext(), item_imageView, 0);
-                    handler.post(action);
-                } else {
-                    Toast.makeText(getApplicationContext(), DummyData.TURN_ON_INTERNET, Toast.LENGTH_SHORT).show();
+                    if (!noConnectivity) {
+                        load_changeable_auction_info();
+                        ImageHelper.loadImage(item_image, getApplicationContext(), item_imageView, 0);
+                        handler.post(action);
+                    } else {
+                        Toast.makeText(getApplicationContext(), DummyData.TURN_ON_INTERNET, Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         }
     };
 
+    private boolean isPaused;
+
     @Override
     public void onResume(){
         super.onResume();
 
+        isPaused = false;
         handler.post(action);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        isPaused = true;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auction);
-        Toolbar toolbar = findViewById(R.id.toolbar);
+
+        View toolbarView = findViewById(R.id.toolbar);
+        Toolbar toolbar = toolbarView.findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(R.string.title_activity_auction);
 

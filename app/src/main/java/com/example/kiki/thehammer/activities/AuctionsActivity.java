@@ -90,25 +90,36 @@ public class AuctionsActivity extends AppCompatActivity
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
+                if(!isPaused){
+                    boolean noConnectivity = intent.getBooleanExtra(
+                            ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
 
-                boolean noConnectivity = intent.getBooleanExtra(
-                        ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
-
-                if (!noConnectivity) {
-                    load_auctions_from_firebase();
-                    handler.post(action);
-                } else {
-                    Toast.makeText(getApplicationContext(), DummyData.TURN_ON_INTERNET, Toast.LENGTH_SHORT).show();
+                    if (!noConnectivity) {
+                        load_auctions_from_firebase();
+                        handler.post(action);
+                    } else {
+                        Toast.makeText(getApplicationContext(), DummyData.TURN_ON_INTERNET, Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         }
     };
 
+    private boolean isPaused;
+
     @Override
     public void onResume(){
         super.onResume();
 
+        isPaused = false;
         handler.post(action);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        isPaused = true;
     }
 
     @Override

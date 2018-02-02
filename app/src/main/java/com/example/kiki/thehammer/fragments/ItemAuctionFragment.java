@@ -37,20 +37,23 @@ public class ItemAuctionFragment extends Fragment {
     private String item_id;
     private ImageView item_imageView;
     private String item_image;
+    private boolean isPaused;
 
     private InternetService internetService = new InternetService(){
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
 
-                boolean noConnectivity = intent.getBooleanExtra(
-                        ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
+                if(!isPaused){
+                    boolean noConnectivity = intent.getBooleanExtra(
+                            ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
 
-                if (!noConnectivity) {
-                    load_auction_info();
-                    ImageHelper.loadImage(item_image, getContext(), item_imageView, 0);
-                } else {
-                    Toast.makeText(getContext(), DummyData.TURN_ON_INTERNET, Toast.LENGTH_SHORT).show();
+                    if (!noConnectivity) {
+                        load_auction_info();
+                        ImageHelper.loadImage(item_image, getContext(), item_imageView, 0);
+                    } else {
+                        Toast.makeText(getContext(), DummyData.TURN_ON_INTERNET, Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         }
@@ -58,6 +61,20 @@ public class ItemAuctionFragment extends Fragment {
 
     public ItemAuctionFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        isPaused = false;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        isPaused = true;
     }
 
     @Override
