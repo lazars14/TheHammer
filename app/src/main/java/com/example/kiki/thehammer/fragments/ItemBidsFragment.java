@@ -167,12 +167,31 @@ public class ItemBidsFragment extends Fragment implements View.OnClickListener{
                                                 if(bid != null){
                                                     if(bid.getAuction().getId().equals(auction_id)){
 
-                                                        if(!bidsListContainsBid(bid.getId())){
-                                                            bids.add(bid);
-                                                            adapter.notifyDataSetChanged();
+                                                        Query userQuery = userService.getUserById(bid.getUser().getId());
 
-                                                            mLayoutManager.scrollToPosition(bids.size() - 1);
-                                                        }
+                                                        userQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                            @Override
+                                                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                                                User u = dataSnapshot.getValue(User.class);
+
+                                                                if(u != null){
+
+                                                                    if(!bidsListContainsBid(bid.getId())){
+                                                                        bid.setUser(u);
+                                                                        bids.add(bid);
+                                                                        adapter.notifyDataSetChanged();
+
+                                                                        mLayoutManager.scrollToPosition(bids.size() - 1);
+                                                                    }
+
+                                                                }
+                                                            }
+
+                                                            @Override
+                                                            public void onCancelled(DatabaseError databaseError) {
+                                                                Toast.makeText(getContext(), DummyData.FAILED_TO_LOAD_DATA, Toast.LENGTH_SHORT).show();
+                                                            }
+                                                        });
                                                     }
                                                 } else Toast.makeText(getContext(), DummyData.FAILED_TO_LOAD_DATA, Toast.LENGTH_SHORT).show();
 
